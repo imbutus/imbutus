@@ -226,6 +226,7 @@ Fingerprint: 64B0 A423 385A 6518 49FD F920 E491 5625 837E 5AD9
 
 **Show public key**
 
+```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQINBGpSurIBEACj0dS+3/A2xbCdnwWOrBNOnbzBoDxSxKdl8F7397HsuRaSuPv9
@@ -255,3 +256,4 @@ YQv3Lr+gV0c89US2Fd2vzMuZ6f/huGMEN8PSdweLrAQahQRUzc56joxd60KucIdR
 eEbBD3eE
 =hE65
 -----END PGP PUBLIC KEY BLOCK-----
+```
