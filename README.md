@@ -33,13 +33,15 @@ The model list is curated intentionally. Three reasons:
 - Redundant models are excluded. 4B and 9B cost nearly the same, but 9B is significantly better — no reason to offer both.
 - Some models are impractical at scale. Kimi-K2.6 requires 8 top-tier GPUs simultaneously — reliably satisfying that demand is near-impossible.
 - Each model requires individual hardware and software tuning. Adding a model takes real work.
+
 Available now:
 
-- [huihui-ai/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated) — Most affordable yet capable model. Great for saving costs and running autonomous agents. 64K ctx reasoning image input
-- [huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated) — Upgraded 9B — newest Claude distillation (Mythos-5), up to 1M-token context, image input, abliterated. Affordable and capable. 64K ctx reasoning image input
-- [huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated) — Middle ground — smart and capable without breaking the bank. 128K ctx reasoning image input
-- [imbutus/YuYu1015-Ornith-1.0-35B-abliterated](https://huggingface.co/imbutus/YuYu1015-Ornith-1.0-35B-abliterated) — Alternative 35B — Ornith 1.0, abliterated and multimodal. Full-precision quality on a single GPU. 128K ctx reasoning image input
-- [huihui-ai/Huihui-Qwen3-Coder-Next-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3-Coder-Next-abliterated) — Most powerful coding-specialized model. Use for programming and code generation. 256K ctx no reasoning
+- [huihui-ai/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated) — Most affordable yet capable model. Great for saving costs and running autonomous agents. · 64K ctx · reasoning · image input
+- [huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated) — Upgraded 9B — newest Claude distillation (Mythos-5), up to 1M-token context, image input, abliterated. Affordable and capable. · 64K ctx · reasoning · image input
+- [huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated) — Middle ground — smart and capable without breaking the bank. · 128K ctx · reasoning · image input
+- [imbutus/YuYu1015-Ornith-1.0-35B-abliterated](https://huggingface.co/imbutus/YuYu1015-Ornith-1.0-35B-abliterated) — Alternative 35B — Ornith 1.0, abliterated and multimodal. Full-precision quality on a single GPU. · 128K ctx · reasoning · image input
+- [huihui-ai/Huihui-Qwen3-Coder-Next-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3-Coder-Next-abliterated) — Most powerful coding-specialized model. Use for programming and code generation. · 256K ctx · no reasoning
+
 New models are added over time. Every model can be found on Hugging Face by the same name.
 
 ### Agentic API
@@ -54,10 +56,12 @@ The web UI works, but it is not the intended primary interface. When a request a
 
 Dedicated VM — give your machine a name when provisioning (e.g. kalinux01). The AI model knows it by that name and gets direct shell access to run nmap, metasploit, sqlmap and any other tool on it. Just say the name in your prompt — the model connects and operates it. Billed per day — terminate anytime.
 ⚠ Billing runs while a session is active. To stop it — use the Stop button on the main page (visible when a model is selected), or tell the model: "stop our session". If no one else is using the GPU at that moment, it will shut down and billing stops immediately.
+
 ### Supported agents
 
 Anthropic and OpenAI are the two standard API protocols supported by almost every AI tool, IDE extension, and agent framework — so anything that works with Claude or ChatGPT connects here out of the box. Pick your client below for a setup guide.
 Anthropic API · /v1/messagesOpenAI API · /v1/chat/completions
+
 - [Pi Open-source AI coding agent for the terminal ](https://imbutus.com/setup/pi)
 - [OpenClaw Open-source autonomous AI agent (clawbot) ](https://imbutus.com/setup/openclaw)
 - [Hermes Agent NousResearch — personal AI agent that grows with you ](https://imbutus.com/setup/hermes-agent)
@@ -70,6 +74,7 @@ Anthropic API · /v1/messagesOpenAI API · /v1/chat/completions
 - [Jan Open-source offline-first AI desktop client ](https://imbutus.com/setup/jan)
 - [Chatbox AI (Desktop) Cross-platform AI chat app (Mac / Windows / Linux) ](https://imbutus.com/setup/chatbox-desktop)
 - [Chatbox AI (Mobile) AI chat app for iOS & Android with voice input ](https://imbutus.com/setup/chatbox-mobile)
+
 Any agent or tool that supports the Anthropic or OpenAI API works here too — not just the ones listed above.
 
 ## Media
@@ -90,92 +95,110 @@ Media generation (video, voice, image) works differently: each session gets a de
 
 ### Models
 
-- [Sulphur 2](https://huggingface.co/SulphurAI/Sulphur-2-base)video generation Decensored
+- [Sulphur 2](https://huggingface.co/SulphurAI/Sulphur-2-base) · video generation · Decensored
+
 Generates video clips from a text prompt, image, audio, or video with LTX Director 2.0. An uncensored version of LTX 2.3.
 
 An uncensored build of LTX 2.3 — its safety filters were removed, so it generates freely with no refusals.
 
-- [LTXDirector](https://github.com/WhatDreamsCost/WhatDreamsCost-ComfyUI)video generation Decensored
+- [LTXDirector](https://github.com/WhatDreamsCost/WhatDreamsCost-ComfyUI) · video generation · Decensored
+
 The ComfyUI workflow this bundle runs on — multi-shot, director-style video generation for LTX 2.3 / Sulphur-2.
 
 An uncensored build of LTX 2.3 — its safety filters were removed, so it generates freely with no refusals.
 
-- [SCAIL-2](https://huggingface.co/zai-org/SCAIL-2)video generation Natively uncensored
+- [SCAIL-2](https://huggingface.co/zai-org/SCAIL-2) · video generation · Natively uncensored
+
 Animates or replaces a character in a video — give it a reference image plus a driving motion video and it transfers the motion (people auto-masked, no manual rigging). Apache-2.0, built on Wan2.1 14B.
 
 The Wan2.1 base ships with no content filter — it generates any content out of the box, nothing was removed.
 
-- [FLUX.2 klein 9B (True V3, uncensored)](https://huggingface.co/wikeeyang/Flux2-Klein-9B-True-V3)image input Decensored
+- [FLUX.2 klein 9B (True V3, uncensored)](https://huggingface.co/wikeeyang/Flux2-Klein-9B-True-V3) · image input · Decensored
+
 Fast 9B FLUX.2 klein, uncensored — the "True V3" aesthetic fine-tune with an abliterated text encoder. Text-to-image, multi-reference editing, and RefControl depth/structure control, light enough for a single 24GB GPU.
 
 Its safety-tuned base is freed by the 'True V3' fine-tune plus an abliterated text encoder — generates freely with no refusals.
 
-- [DarkBeast Klein 9b V2 BFS (face-swap, uncensored)](https://huggingface.co/wraps/FLUX.2-klein-9B-Blitz-ComfyUI)image input Decensored
+- [DarkBeast Klein 9b V2 BFS (face-swap, uncensored)](https://huggingface.co/wraps/FLUX.2-klein-9B-Blitz-ComfyUI) · image input · Decensored
+
 DarkBeast Klein 9b V2 BFS — a face-swap-specialized fine-tune of FLUX.2 klein 9B, uncensored. Distilled for 5 steps at CFG 1 (Best Face Swap tech): give it a target photo and a reference face and it pastes the identity in while keeping pose, expression and lighting. Ships alongside the True V3 tune — just pick it in the loader. fp8 on a 24GB card, bf16 on 32GB.
 
 Its safety-tuned base is freed by the 'True V3' fine-tune plus an abliterated text encoder — generates freely with no refusals.
 
-- [Ideogram 4](https://huggingface.co/Comfy-Org/Ideogram-4)image input Partly freed
+- [Ideogram 4](https://huggingface.co/Comfy-Org/Ideogram-4) · image input · Partly freed
+
 Text-to-image with strong typography — great for legible text & design. Visually place text and elements at exact positions on a canvas (regional layout control).
 
 The abliterated encoder removes prompt refusals, but NSFW was filtered from the model's training data, so results in that area are still inconsistent.
 
-- [Qwen-Image-2512](https://huggingface.co/Qwen/Qwen-Image-2512)image input Fully uncensored
+- [Qwen-Image-2512](https://huggingface.co/Qwen/Qwen-Image-2512) · image input · Fully uncensored
+
 Generates images from text with high prompt fidelity and strong text-in-image rendering.
 
 Trained on unrestricted data and run with an abliterated text encoder — no refusals and no quality loss on any content.
 
-- [Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511)image input Fully uncensored
+- [Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511) · image input · Fully uncensored
+
 Edits existing images by prompt — background swaps, object add/remove, restyling (up to 3 input images).
 
 Trained on unrestricted data and run with an abliterated text encoder — no refusals and no quality loss on any content.
 
-- [Boogu-Image Turbo](https://huggingface.co/Boogu/Boogu-Image-0.1-Turbo)image input Mostly freed
+- [Boogu-Image Turbo](https://huggingface.co/Boogu/Boogu-Image-0.1-Turbo) · image input · Mostly freed
+
 Fast 4-step text-to-image with strong photorealism and bilingual (English/Chinese) text rendering.
 
 The abliterated encoder removes prompt refusals, but the model has soft safety and results in that area can still be inconsistent.
 
-- [Boogu-Image Edit](https://huggingface.co/Boogu/Boogu-Image-0.1-Edit)image input Mostly freed
+- [Boogu-Image Edit](https://huggingface.co/Boogu/Boogu-Image-0.1-Edit) · image input · Mostly freed
+
 Instruction-based image editing — describe the change in text to insert, replace, or restyle objects in an image.
 
 The abliterated encoder removes prompt refusals, but the model has soft safety and results in that area can still be inconsistent.
 
-- [Krea-2 Turbo](https://huggingface.co/krea/Krea-2-Turbo)image input Fully uncensored
+- [Krea-2 Turbo](https://huggingface.co/krea/Krea-2-Turbo) · image input · Fully uncensored
+
 Fast, photorealistic text-to-image at up to 2K resolution, with 9 selectable style LoRAs for different looks.
 
 Natively NSFW-capable and run with an abliterated text encoder — no refusals and no quality loss on any content.
 
-- [Fish Audio S2 Pro](https://huggingface.co/fishaudio/s2-pro)voice No content filter
+- [Fish Audio S2 Pro](https://huggingface.co/fishaudio/s2-pro) · voice · No content filter
+
 TTS + voice cloning across 80+ languages with best-in-class accuracy scores. Research license — non-commercial use.
 
 A text-to-speech model with no content restrictions — it speaks whatever text you provide.
 
-- [Qwen3-ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B)voice No content filter
+- [Qwen3-ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) · voice · No content filter
+
 Alternative speech-to-text engine for voice-to-SRT. Newest SOTA accuracy, with built-in word-level timestamps.
 
 A text-to-speech model with no content restrictions — it speaks whatever text you provide.
 
-- [WhisperX](https://github.com/m-bain/whisperX)voice No content filter
+- [WhisperX](https://github.com/m-bain/whisperX) · voice · No content filter
+
 Speech-to-text engine for voice-to-SRT (default). Whisper core plus phoneme forced-alignment for very tight word-level subtitle timing, plus speaker diarization.
 
 A text-to-speech model with no content restrictions — it speaks whatever text you provide.
 
-- [CosyVoice 3](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512)voice No content filter
+- [CosyVoice 3](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512) · voice · No content filter
+
 Text-to-speech and voice cloning / conversion, plus voice-to-SRT and SRT-to-voice. A reference voice sample defines the output voice.
 
 A text-to-speech model with no content restrictions — it speaks whatever text you provide.
 
-- [Qwen3-TTS-1.7B-VoiceDesign](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign)voice No content filter
+- [Qwen3-TTS-1.7B-VoiceDesign](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign) · voice · No content filter
+
 Voice design model — describe the voice you want in plain words (gender, age, mood, accent) and it speaks your text with that voice. 10 languages.
 
 A text-to-speech model with no content restrictions — it speaks whatever text you provide.
 
-- [Qwen3-TTS-1.7B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base)voice No content filter
+- [Qwen3-TTS-1.7B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base) · voice · No content filter
+
 Voice cloning model — a 3-second reference sample defines the output voice. 10 languages.
 
 A text-to-speech model with no content restrictions — it speaks whatever text you provide.
 
-- [Chatterbox Multilingual v3](https://huggingface.co/ResembleAI/chatterbox)voice No content filter
+- [Chatterbox Multilingual v3](https://huggingface.co/ResembleAI/chatterbox) · voice · No content filter
+
 TTS + voice cloning + native voice conversion in 23 languages. Preferred over ElevenLabs in blind listening tests. MIT license.
 
 A text-to-speech model with no content restrictions — it speaks whatever text you provide.
@@ -186,6 +209,7 @@ Each bundle opens in ComfyUI with ready-made example workflows (Workflows panel)
 
 - **Required** — you must provide this before running — upload a file or type a prompt.
 - **Crucial** — important to check or commonly adjusted — aspect ratio, mode, or key settings.
+
 ## Partnership Program
 
 Go to the Referrals page to get your promo code and share it. Anyone who uses it gets 10% off. You earn 15% of everything they spend.
