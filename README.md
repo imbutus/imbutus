@@ -222,7 +222,7 @@ This is the project philosophy. First of all, I built these tools for my own cas
 
 To let anyone verify that this project is authentic and controlled by its original creator, I publish my PGP public key below. If you ever encounter a dispute or an impersonation of this project, any message signed with the key matching this fingerprint can be trusted as coming from me.
 
-Fingerprint: 64B0 A423 385A 6518 49FD F920 E491 5625 837E 5AD9
+Fingerprint: `64B0 A423 385A 6518 49FD F920 E491 5625 837E 5AD9`
 
 **Show public key**
 
