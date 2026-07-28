@@ -109,26 +109,28 @@ The web UI chat works, but it is not the intended primary interface. When a requ
 
 Dedicated VM — give your machine a name when provisioning (e.g. kalinux01). The AI model knows it by that name and gets direct shell access to run nmap, metasploit, sqlmap and any other tool on it. Just say the name in your prompt — the model connects and operates it. Billed per day — terminate anytime.
 
-⚠Billing runs while a session is active. To stop it — use the Stop button on the main page (visible when a model is selected), or tell the model: "stop our session". If no one else is using the GPU at that moment, it will shut down and billing stops immediately.
+⚠ Billing runs while a session is active. To stop it — use the Stop button on the main page (visible when a model is selected), or tell the model: "stop our session". If no one else is using the GPU at that moment, it will shut down and billing stops immediately.
 
 ### Supported agents
 
 Almost every AI tool, IDE extension, and agent framework speaks one of two API formats — Anthropic's Messages API (/v1/messages) or OpenAI's Chat Completions (/v1/chat/completions). Both work here, so anything that connects to Claude or ChatGPT connects out of the box. Pick your client below for a setup guide.
 
-`Anthropic API · /v1/messages``OpenAI API · /v1/chat/completions`
+- `Anthropic API · /v1/messages`
 
-- [PiOpen-source AI coding agent for the terminal](https://imbutus.com/setup/pi)
-- [OpenClawOpen-source autonomous AI agent (clawbot)](https://imbutus.com/setup/openclaw)
-- [Hermes AgentNousResearch — personal AI agent that grows with you](https://imbutus.com/setup/hermes-agent)
-- [ZedHigh-performance code editor with built-in AI](https://imbutus.com/setup/zed)
-- [Claude CodeAnthropic — AI coding agent for the terminal](https://imbutus.com/setup/claude-code)
-- [opencodeOpen-source AI coding agent — TUI, desktop & IDE](https://imbutus.com/setup/opencode)
-- [CursorAI-first code editor](https://imbutus.com/setup/cursor)
-- [ClineAutonomous AI coding agent for VS Code](https://imbutus.com/setup/cline)
-- [AiderAI pair programming in the terminal](https://imbutus.com/setup/aider)
-- [JanOpen-source offline-first AI desktop client](https://imbutus.com/setup/jan)
-- [Chatbox AI (Desktop)Cross-platform AI chat app (Mac / Windows / Linux)](https://imbutus.com/setup/chatbox-desktop)
-- [Chatbox AI (Mobile)AI chat app for iOS & Android with voice input](https://imbutus.com/setup/chatbox-mobile)
+- `OpenAI API · /v1/chat/completions`
+
+- [Pi](https://imbutus.com/setup/pi) — Open-source AI coding agent for the terminal
+- [OpenClaw](https://imbutus.com/setup/openclaw) — Open-source autonomous AI agent (clawbot)
+- [Hermes Agent](https://imbutus.com/setup/hermes-agent) — NousResearch — personal AI agent that grows with you
+- [Zed](https://imbutus.com/setup/zed) — High-performance code editor with built-in AI
+- [Claude Code](https://imbutus.com/setup/claude-code) — Anthropic — AI coding agent for the terminal
+- [opencode](https://imbutus.com/setup/opencode) — Open-source AI coding agent — TUI, desktop & IDE
+- [Cursor](https://imbutus.com/setup/cursor) — AI-first code editor
+- [Cline](https://imbutus.com/setup/cline) — Autonomous AI coding agent for VS Code
+- [Aider](https://imbutus.com/setup/aider) — AI pair programming in the terminal
+- [Jan](https://imbutus.com/setup/jan) — Open-source offline-first AI desktop client
+- [Chatbox AI (Desktop)](https://imbutus.com/setup/chatbox-desktop) — Cross-platform AI chat app (Mac / Windows / Linux)
+- [Chatbox AI (Mobile)](https://imbutus.com/setup/chatbox-mobile) — AI chat app for iOS & Android with voice input
 
 Any agent or tool that supports the Anthropic or OpenAI API works here too — not just the ones listed above.
 
