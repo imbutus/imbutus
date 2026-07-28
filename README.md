@@ -6,6 +6,10 @@
 
 *This file mirrors the [live documentation page](https://imbutus.com/docs). When that page changes, this file is regenerated from it.*
 
+**News:** [github.com/imbutus/news](https://github.com/imbutus/news) — release notes and announcements, also published at [imbutus.com/news](https://imbutus.com/news).
+
+**Questions or problems?** Open a [support ticket](https://imbutus.com/support) — it is tied to your account, so I can see your models, GPU sessions and billing, and it stays private. You can also open an [issue](https://github.com/imbutus/news/issues) for anything that is not account-specific, such as a mistake in the docs or a general question.
+
 ---
 
 ## Documentation
