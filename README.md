@@ -41,7 +41,7 @@ The model list is curated intentionally. Four reasons:
 - Some models are simply too big to start quickly. A checkpoint of several hundred gigabytes can take hours just to download onto a fresh GPU before it answers anything.
 - Each model requires individual hardware and software tuning. Adding a model takes real work.
 
-Available now:
+**Available now**
 
 #### Cheap
 
@@ -115,7 +115,7 @@ Dedicated VM — give your machine a name when provisioning (e.g. kalinux01). Th
 
 Almost every AI tool, IDE extension, and agent framework speaks one of two API formats — Anthropic's Messages API (/v1/messages) or OpenAI's Chat Completions (/v1/chat/completions). Both work here, so anything that connects to Claude or ChatGPT connects out of the box. Pick your client below for a setup guide.
 
-Anthropic API · /v1/messagesOpenAI API · /v1/chat/completions
+`Anthropic API · /v1/messages``OpenAI API · /v1/chat/completions`
 
 - [PiOpen-source AI coding agent for the terminal](https://imbutus.com/setup/pi)
 - [OpenClawOpen-source autonomous AI agent (clawbot)](https://imbutus.com/setup/openclaw)
@@ -156,41 +156,49 @@ Each bundle is one GPU pod with its own models and ready-to-run workflows. You r
 
 #### Video
 
+---
+
 ##### Sulphur-2 · Bundle · Decensored
 
 Generates video clips from a text prompt, image, audio, or video with LTX Director 2.0. Sulphur-2 is an uncensored version of LTX 2.3.
 
 ComfyUI workflow: [LTXDirector](https://github.com/WhatDreamsCost/WhatDreamsCost-ComfyUI)
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-sulphur2-ltx-director-2
+<details>
+<summary><b>sulphur2-ltx-director-2</b></summary>
 
 Too large a graph to summarise here — watch the walkthrough: [LTXDirector](https://github.com/WhatDreamsCost/WhatDreamsCost-ComfyUI)
 
-Video tutorial
+</details>
+
+**Video tutorial**
 
 Sulphur-2 bundle walkthrough:
 
 [EN](https://imbutus.com/media-videos/imbutus-media-sulphur2/imbutus-media-sulphur2-en.mp4) · [RU](https://imbutus.com/media-videos/imbutus-media-sulphur2/imbutus-media-sulphur2-ru.mp4) · [中文](https://imbutus.com/media-videos/imbutus-media-sulphur2/imbutus-media-sulphur2-zh.mp4)
 
-Models in this bundle
+**Models in this bundle**
 
 - [Sulphur 2](https://huggingface.co/SulphurAI/Sulphur-2-base)
+
+---
 
 ##### SCAIL-2 · Bundle · Natively uncensored
 
 Character animation & replacement — drive a reference character with a motion video; people are auto-masked (SAM 3.1), no manual rigging. Built on Wan2.1 14B. Output is silent — add sound afterwards in a video editor.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-scail2-animation
+<details>
+<summary><b>scail2-animation</b></summary>
 
-SCAIL-2 — Character Animation
+**SCAIL-2 — Character Animation**
 
 Take the motion out of one video and put your own character into it. The driving video's background is not kept — the scene is generated fresh around your character.
 
-Fill these in
+**Fill these in**
 
 1. Load Video — your driving clip. Only the movement is used, never the appearance.
 
@@ -244,9 +252,12 @@ Leave alone unless you know why
 • Create SCAIL-2 Colored Mask → replacement_mode — `false` here on purpose. Setting it `true` switches to the replacement behaviour (keeps the original background), which is what the scail2-replacement workflow already does.
 • Every model this workflow needs is already installed on the pod.
 
-scail2-animation-multi-char
+</details>
 
-SCAIL-2 — Character Animation (two characters)
+<details>
+<summary><b>scail2-animation-multi-char</b></summary>
+
+**SCAIL-2 — Character Animation (two characters)**
 
 Same graph as the single-character animation, driven by a clip with two moving subjects. Only the inputs and the prompts differ.
 
@@ -258,7 +269,7 @@ It has to be one real photograph of both subjects together — one background, o
 
 Do not glue two separate photos side by side. A collage keeps both backgrounds and the seam between them, and the render comes out looking like two videos in one frame. If all you have is a separate photo of each character, this workflow cannot merge them — run the single-character scail2-animation workflow on each one instead.
 
-Fill these in
+**Fill these in**
 
 1. Load Image — one picture holding both characters. The output video is sized to this image, so a wide image gives a wide video. Both characters should be clearly separated and, if you want limbs animated, fully in frame.
 
@@ -314,13 +325,16 @@ Leave alone unless you know why
 • replacement_mode — `false` here on purpose; the background is meant to be generated fresh. To keep an original background instead, use the scail2-replacement workflow.
 • Every model this workflow needs is already installed on the pod.
 
-scail2-replacement
+</details>
 
-SCAIL-2 — Character Replacement
+<details>
+<summary><b>scail2-replacement</b></summary>
+
+**SCAIL-2 — Character Replacement**
 
 Swap one person in your video for your own character. The original scene, background and everyone else stay exactly as they are.
 
-Steps
+**Steps**
 
 1. Load Video — upload your clip. The output is sized to this video, not to your image.
 2. Load Image — upload the character who takes their place. A clear, full-body photo works best.
@@ -370,21 +384,26 @@ Leave alone unless you know why
 • Output size comes from the video via Get Image from Batch, not from your reference image — so a portrait clip stays portrait no matter what you upload.
 • Every model this workflow needs is already installed on the pod.
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [SCAIL-2](https://huggingface.co/zai-org/SCAIL-2)
 
 #### Image
 
+---
+
 ##### FLUX.2 klein · Bundle · Decensored
 
 FLUX.2 klein 9B (uncensored) — fast text → image + multi-reference editing, plus RefControl depth/structure control. 'True V3' aesthetic tune (Q8 GGUF) with an abliterated text encoder. Personal favorite: don't let the low price fool you — multi-reference editing and RefControl rival pricier bundles, on a single 24GB GPU.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-flux2-klein-controlnet
+<details>
+<summary><b>flux2-klein-controlnet</b></summary>
 
-ControlNet (depth) — klein
+**ControlNet (depth) — klein**
 
 1. Load Image depth (red) — drop the photo whose structure you want to copy. A depth map is auto-extracted (Depth Anything V2).
 2. Load Image reference (red) — drop the subject/style reference to place into that structure.
@@ -394,9 +413,12 @@ ControlNet (depth) — klein
 
 Powered by the RefControl depth LoRA for klein 9B. The first depth run downloads the preprocessor weights (~1.3GB) once.
 
-flux2-klein-darkbeast-faceswap
+</details>
 
-Face Swap — DarkBeast (klein 9B)
+<details>
+<summary><b>flux2-klein-darkbeast-faceswap</b></summary>
+
+**Face Swap — DarkBeast (klein 9B)**
 
 1. Target photo (red, top-left) — the picture whose face gets replaced. Ships with `example.png` so the graph runs out of the box.
 2. Face to swap in (red, bottom-left) — the source face/identity to paste on.
@@ -407,9 +429,12 @@ Face Swap — DarkBeast (klein 9B)
 
 DarkBeast Klein 9b V2 BFS — face-swap-specialized klein 9B (safetensors, loaded via UNETLoader).
 
-flux2-klein-edit
+</details>
 
-Image Edit — klein (multi-reference)
+<details>
+<summary><b>flux2-klein-edit</b></summary>
+
+**Image Edit — klein (multi-reference)**
 
 1. Load Image (red, group *image 1*) — drop the reference picture. It ships with `example.png` so the graph runs out of the box.
 2. Prompt — describe the edit inside the Image Edit node.
@@ -419,9 +444,12 @@ Image Edit — klein (multi-reference)
 
 FLUX.2 klein 9B (uncensored) — fast text → image + up to 10 reference images.
 
-flux2-klein-text-to-image
+</details>
 
-How to use
+<details>
+<summary><b>flux2-klein-text-to-image</b></summary>
+
+**How to use**
 
 1. Prompt (orange) — type what you want to generate.
 2. Two variants: Standard and Distilled (faster). Enable one and bypass the other with Ctrl-B.
@@ -429,16 +457,20 @@ How to use
 
 FLUX.2 klein 9B (uncensored) — fast text → image.
 
-Video tutorial
+</details>
+
+**Video tutorial**
 
 FLUX.2 klein bundle walkthrough:
 
 [EN](https://imbutus.com/media-videos/imbutus-media-klein/imbutus-media-klein-en.mp4) · [RU](https://imbutus.com/media-videos/imbutus-media-klein/imbutus-media-klein-ru.mp4) · [中文](https://imbutus.com/media-videos/imbutus-media-klein/imbutus-media-klein-zh.mp4)
 
-Models in this bundle
+**Models in this bundle**
 
 - [FLUX.2 klein 9B (True V3, uncensored)](https://huggingface.co/wikeeyang/Flux2-Klein-9B-True-V3)Fast 9B FLUX.2 klein, uncensored — the "True V3" aesthetic fine-tune with an abliterated text encoder. Text-to-image, multi-reference editing, and RefControl depth/structure control, light enough for a single 24GB GPU.
 - [DarkBeast Klein 9b V2 BFS (face-swap, uncensored)](https://huggingface.co/wraps/FLUX.2-klein-9B-Blitz-ComfyUI)DarkBeast Klein 9b V2 BFS — a face-swap-specialized fine-tune of FLUX.2 klein 9B, uncensored. Distilled for 5 steps at CFG 1 (Best Face Swap tech): give it a target photo and a reference face and it pastes the identity in while keeping pose, expression and lighting. Ships alongside the True V3 tune — just pick it in the loader. fp8 on a 24GB card, bf16 on 32GB.
+
+---
 
 ##### Ideogram 4 · Bundle · Partly freed
 
@@ -446,11 +478,12 @@ Text-to-image with strong typography — great for legible text & design. Visual
 
 The abliterated encoder removes prompt refusals, but NSFW was filtered from the model's training data, so results in that area are still inconsistent.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-ideogram4-text-to-image
+<details>
+<summary><b>ideogram4-text-to-image</b></summary>
 
-How to use
+**How to use**
 
 1. Prompt Builder (red) — type your prompt in the Description field (plain language is fine). For layout control, open the Ideogram 4 editor and drag boxes to place objects/text in regions.
 2. Resolution Selector (orange) — choose aspect ratio / size.
@@ -458,19 +491,24 @@ How to use
 
 *"Image blocked by safety filter" comes from the model's own safety training, not ComfyUI.*
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [Ideogram 4](https://huggingface.co/Comfy-Org/Ideogram-4)
+
+---
 
 ##### Qwen-Image-2512-Edit-2511 · Bundle · Fully uncensored
 
 Contains two models: Qwen-Image-2512 generates images from text, and Qwen-Image-Edit-2511 edits existing images by prompt (up to 3 input images). Includes a Multi-angle Camera workflow — drag a 3D handle to change the camera angle of any photo.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-qwen-image-edit
+<details>
+<summary><b>qwen-image-edit</b></summary>
 
-How to use
+**How to use**
 
 1. Load Image — upload image 1 (required). Type the edit instruction in the Image Edit prompt field.
 2. To combine pictures, enable Load Image 2 / 3 (right-click → Set Mode → Always) and upload.
@@ -478,9 +516,12 @@ How to use
 
 Predefined example — reset every GPU start; use Workflows → Save As to keep your own copy.
 
-qwen-image-edit-multiangle-camera
+</details>
 
-How to use
+<details>
+<summary><b>qwen-image-edit-multiangle-camera</b></summary>
+
+**How to use**
 
 1. Load Image (red) — drop the photo whose camera angle you want to change.
 2. Qwen Multiangle Camera (red) — drag the 3D handle to set the angle, or pick a preset. The prompt is built for you.
@@ -488,13 +529,19 @@ How to use
 
 Powered by Qwen-Image-Edit-2511 + the multi-angle camera LoRA (4-step Lightning).
 
-qwen-style-transfer
+</details>
+
+<details>
+<summary><b>qwen-style-transfer</b></summary>
 
 The quality of the style transfer depends largely on the quality of the RF inversion. These settings work well, but feel free to try other values.
 
-qwen-text-to-image
+</details>
 
-How to use
+<details>
+<summary><b>qwen-text-to-image</b></summary>
+
+**How to use**
 
 1. Text to Image (red) — type your prompt in the text field, set width / height (and seed if you want).
 2. Press Run — the image appears in Save Image.
@@ -503,9 +550,12 @@ Sizes: 1:1 1328×1328 · 16:9 1664×928 · 9:16 928×1664 · 4:3 1472×1104 · 3
 
 Predefined example — reset on every GPU start. Use Workflows → Save As to keep your own copy.
 
-qwen-upscale-4k
+</details>
 
-Upscale to 4K
+<details>
+<summary><b>qwen-upscale-4k</b></summary>
+
+**Upscale to 4K**
 
 1. Load Image (red) — drop any image (e.g. one you made with the Text-to-Image workflow).
 2. Target size (yellow) — `Scale to Total Pixels` sets the working resolution. `4` MP ≈ 4K; raise/lower for your GPU.
@@ -514,10 +564,14 @@ Upscale to 4K
 
 This is a single refine pass on an existing image. Generate first in the Text-to-Image workflow, then upscale here.
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [Qwen-Image-2512](https://huggingface.co/Qwen/Qwen-Image-2512)Generates images from text with high prompt fidelity and strong text-in-image rendering.
 - [Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511)Edits existing images by prompt — background swaps, object add/remove, restyling (up to 3 input images).
+
+---
 
 ##### Boogu-Image · Bundle · Mostly freed
 
@@ -525,11 +579,12 @@ Two models in one bundle: Boogu Turbo for fast text-to-image, and Boogu Edit for
 
 The abliterated encoder removes prompt refusals, but the model has soft safety and results in that area can still be inconsistent.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-boogu-edit
+<details>
+<summary><b>boogu-edit</b></summary>
 
-How to use
+**How to use**
 
 1. Load Image (red) — upload the image you want to edit.
 2. Instruction — double-click the red Image Edit (Boogu) subgraph and type what to change in the prompt box.
@@ -538,9 +593,12 @@ How to use
 
 Boogu Edit is instruction-based image editing with strong bilingual (English / 中文) text rendering.
 
-boogu-turbo-t2i
+</details>
 
-How to use
+<details>
+<summary><b>boogu-turbo-t2i</b></summary>
+
+**How to use**
 
 1. Prompt — double-click the red Text to Image (Boogu Turbo) subgraph and type your description in the prompt box.
 2. Resolution (yellow) — pick aspect ratio / size in Resolution Selector.
@@ -548,20 +606,25 @@ How to use
 
 Boogu Turbo is a fast text-to-image model with strong bilingual (English / 中文) text rendering. For instruction-based image editing, open the Boogu Edit workflow.
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [Boogu-Image Turbo](https://huggingface.co/Boogu/Boogu-Image-0.1-Turbo)Fast 4-step text-to-image with strong photorealism and bilingual (English/Chinese) text rendering.
 - [Boogu-Image Edit](https://huggingface.co/Boogu/Boogu-Image-0.1-Edit)Instruction-based image editing — describe the change in text to insert, replace, or restyle objects in an image.
+
+---
 
 ##### Krea-2 · Bundle · Fully uncensored
 
 Fast, photorealistic text-to-image at up to 2K resolution, with 9 selectable style LoRAs for different looks.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-krea2-text-to-image
+<details>
+<summary><b>krea2-text-to-image</b></summary>
 
-How to use
+**How to use**
 
 1. Prompt — double-click the red Text to Image (Krea-2 Turbo) subgraph and type your description in Text String (User Prompt).
 2. Resolution (orange) — pick aspect ratio / size in Resolution Selector.
@@ -583,25 +646,30 @@ Style LoRAs — set `enable_lora?` to true inside the subgraph, pick a `krea2_*`
 | `krea2_sunsetblur` | `ethereal motion blur style` | `1.0` |
 | `krea2_vintagetarot` | `vintage tarot style` | `1.0` |
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [Krea-2 Turbo](https://huggingface.co/krea/Krea-2-Turbo)
 
 #### Voice
 
-Shared models
+**Shared models**
 
 - [WhisperX](https://github.com/m-bain/whisperX)Speech-to-text engine for voice-to-SRT (default). Whisper core plus phoneme forced-alignment for very tight word-level subtitle timing, plus speaker diarization.Used in: Fish Audio S2 · CosyVoice 3 · Qwen3-TTS · Chatterbox Multilingual
+
+---
 
 ##### Fish Audio S2 · Bundle · No content filter
 
 The dubbing pick — text-to-speech and voice cloning across 80+ languages (Fish Audio S2 Pro) with best-in-class transcription-accuracy scores. Voice-to-SRT and SRT-to-voice dubbing keep the original timing, transcribed with WhisperX.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-common-align-script-to-srt
+<details>
+<summary><b>common-align-script-to-srt</b></summary>
 
-Script → per-section SRT
+**Script → per-section SRT**
 
 1. Load audio (red, left) — upload the recording of your narration.
 2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
@@ -610,7 +678,10 @@ Script → per-section SRT
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
-common-audio-to-srt
+</details>
+
+<details>
+<summary><b>common-audio-to-srt</b></summary>
 
 AUDIO -> SRT (transcribe, keep timing).
 
@@ -622,7 +693,10 @@ The Qwen3-TTS bundle additionally offers 'qwen3-asr' as an alternative engine; e
 
 Then translate that SRT text (keep the timestamps unchanged) and feed it to the 'SRT -> Audio' workflow to get a dubbed track with the SAME timing.
 
-fishs2-srt-to-audio
+</details>
+
+<details>
+<summary><b>fishs2-srt-to-audio</b></summary>
 
 SRT -> dubbed AUDIO, voice cloned, original timing preserved (Fish Audio S2 Pro).
 
@@ -634,7 +708,10 @@ Optional: press '🎙 Transcribe' on the dub node to preview the WhisperX transc
 
 Knobs: fit_to_timing (on = lock each line into its SRT slot), max_stretch (cap before audio sounds sped-up).
 
-fishs2-voice-clone
+</details>
+
+<details>
+<summary><b>fishs2-voice-clone</b></summary>
 
 TTS + VOICE CLONE (Fish Audio S2 Pro, 80+ languages).
 
@@ -647,19 +724,24 @@ Tip: leave 'Reference voice' unconnected to let the model pick a random voice.
 
 The S2 server starts at boot; the first request after boot may wait a bit while it warms up.
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [Fish Audio S2 Pro](https://huggingface.co/fishaudio/s2-pro)
+
+---
 
 ##### CosyVoice 3 · Bundle · No content filter
 
 The change-voice pick — native voice conversion keeps the original words, pauses and delivery and swaps only the timbre, with no transcription step in between. Also voice cloning, TTS, voice-to-SRT and SRT-to-voice, transcribed with WhisperX.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-common-align-script-to-srt
+<details>
+<summary><b>common-align-script-to-srt</b></summary>
 
-Script → per-section SRT
+**Script → per-section SRT**
 
 1. Load audio (red, left) — upload the recording of your narration.
 2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
@@ -668,7 +750,10 @@ Script → per-section SRT
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
-common-audio-to-srt
+</details>
+
+<details>
+<summary><b>common-audio-to-srt</b></summary>
 
 AUDIO -> SRT (transcribe, keep timing).
 
@@ -680,7 +765,10 @@ The Qwen3-TTS bundle additionally offers 'qwen3-asr' as an alternative engine; e
 
 Then translate that SRT text (keep the timestamps unchanged) and feed it to the 'SRT -> Audio' workflow to get a dubbed track with the SAME timing.
 
-cosyvoice3-change-voice
+</details>
+
+<details>
+<summary><b>cosyvoice3-change-voice</b></summary>
 
 CHANGE VOICE (CosyVoice 3 native voice conversion) — keeps the words and the delivery, swaps only the timbre.
 
@@ -696,7 +784,10 @@ First run downloads the CosyVoice model (~GB) — give it a few minutes.
 
 ⚠️ Predefined example — it resets to the original every GPU start; edits here are lost. Save under a NEW name (Save As) to keep your own copy; custom workflows persist between sessions.
 
-cosyvoice3-srt-to-audio
+</details>
+
+<details>
+<summary><b>cosyvoice3-srt-to-audio</b></summary>
 
 SRT -> dubbed AUDIO, voice cloned, original timing preserved.
 
@@ -711,7 +802,10 @@ Languages: EN and ZH are solid. Other officially supported languages can be less
 
 First run downloads the CosyVoice model (~GB).
 
-cosyvoice3-voice-clone
+</details>
+
+<details>
+<summary><b>cosyvoice3-voice-clone</b></summary>
 
 VOICE CLONE (CosyVoice 3 zero-shot).
 
@@ -725,19 +819,24 @@ To re-voice EXISTING speech instead of generating new speech, use the 'Change Vo
 
 ⚠️ Predefined example — it resets to the original every GPU start; edits here are lost. Save under a NEW name (Save As) to keep your own copy; custom workflows persist between sessions.
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [CosyVoice 3](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512)
+
+---
 
 ##### Qwen3-TTS · Bundle · No content filter
 
 The all-Qwen bundle — text-to-speech with 3-second voice cloning plus voice design: describe a voice in plain words and it speaks (Qwen3-TTS 1.7B). Also voice-to-SRT and SRT-to-voice dubbing, and it is the only bundle that ships Qwen3-ASR as a second transcription engine alongside WhisperX.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-common-align-script-to-srt
+<details>
+<summary><b>common-align-script-to-srt</b></summary>
 
-Script → per-section SRT
+**Script → per-section SRT**
 
 1. Load audio (red, left) — upload the recording of your narration.
 2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
@@ -746,7 +845,10 @@ Script → per-section SRT
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
-common-audio-to-srt
+</details>
+
+<details>
+<summary><b>common-audio-to-srt</b></summary>
 
 AUDIO -> SRT (transcribe, keep timing).
 
@@ -758,7 +860,10 @@ The Qwen3-TTS bundle additionally offers 'qwen3-asr' as an alternative engine; e
 
 Then translate that SRT text (keep the timestamps unchanged) and feed it to the 'SRT -> Audio' workflow to get a dubbed track with the SAME timing.
 
-qwen3tts-redub-voice
+</details>
+
+<details>
+<summary><b>qwen3tts-redub-voice</b></summary>
 
 RE-DUB VOICE (Qwen3-TTS pipeline: transcribe -> re-speak, timing preserved).
 
@@ -772,7 +877,10 @@ Line timing is preserved, but the words are re-generated, so intonation, pauses 
 
 For REAL voice conversion — same words, same delivery, only the timbre swapped — use the CosyVoice 3 bundle (the change-voice pick) or Chatterbox Multilingual. Both do it natively with no transcription step.
 
-qwen3tts-srt-to-audio
+</details>
+
+<details>
+<summary><b>qwen3tts-srt-to-audio</b></summary>
 
 SRT -> dubbed AUDIO, voice cloned, original timing preserved (Qwen3-TTS).
 
@@ -785,7 +893,10 @@ Knobs: fit_to_timing (on = lock each line into its SRT slot), max_stretch (cap b
 
 Each line is synthesized with the cloned voice and placed at its SRT timestamp, so the output lines up with your video.
 
-qwen3tts-voice-clone
+</details>
+
+<details>
+<summary><b>qwen3tts-voice-clone</b></summary>
 
 VOICE CLONE (Qwen3-TTS 1.7B Base).
 
@@ -796,7 +907,10 @@ VOICE CLONE (Qwen3-TTS 1.7B Base).
 
 First run loads the model (pre-baked at boot, a few seconds).
 
-qwen3tts-voice-design
+</details>
+
+<details>
+<summary><b>qwen3tts-voice-design</b></summary>
 
 VOICE DESIGN (Qwen3-TTS 1.7B VoiceDesign).
 
@@ -808,21 +922,26 @@ No reference audio needed — describe the voice you want in plain language.
 
 Tip: to REUSE a designed voice, save its output and feed it into the Voice Clone workflow as the reference sample.
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [Qwen3-TTS-1.7B-VoiceDesign](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign)Voice design model — describe the voice you want in plain words (gender, age, mood, accent) and it speaks your text with that voice. 10 languages.
 - [Qwen3-TTS-1.7B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base)Voice cloning model — a 3-second reference sample defines the output voice. 10 languages.
 - [Qwen3-ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B)Alternative speech-to-text engine for voice-to-SRT, shipped only in the Qwen3-TTS bundle. Built-in word-level timestamps.
 
+---
+
 ##### Chatterbox Multilingual · Bundle · No content filter
 
 Text-to-speech, voice cloning and native voice conversion in 23 languages (Chatterbox Multilingual v3) — the model that beat ElevenLabs in blind listening tests. Also voice-to-SRT and SRT-to-voice dubbing, transcribed with WhisperX.
 
-Ready-to-run workflows
+**Ready-to-run workflows**
 
-common-align-script-to-srt
+<details>
+<summary><b>common-align-script-to-srt</b></summary>
 
-Script → per-section SRT
+**Script → per-section SRT**
 
 1. Load audio (red, left) — upload the recording of your narration.
 2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
@@ -831,7 +950,10 @@ Script → per-section SRT
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
-common-audio-to-srt
+</details>
+
+<details>
+<summary><b>common-audio-to-srt</b></summary>
 
 AUDIO -> SRT (transcribe, keep timing).
 
@@ -843,7 +965,10 @@ The Qwen3-TTS bundle additionally offers 'qwen3-asr' as an alternative engine; e
 
 Then translate that SRT text (keep the timestamps unchanged) and feed it to the 'SRT -> Audio' workflow to get a dubbed track with the SAME timing.
 
-chatterbox-change-voice
+</details>
+
+<details>
+<summary><b>chatterbox-change-voice</b></summary>
 
 VOICE CONVERSION (Chatterbox VC).
 
@@ -855,7 +980,10 @@ Replaces the VOICE in a recording while keeping the words, pacing and intonation
 
 First run loads the VC model (pre-baked at boot, a few seconds).
 
-chatterbox-srt-to-audio
+</details>
+
+<details>
+<summary><b>chatterbox-srt-to-audio</b></summary>
 
 SRT -> dubbed AUDIO, voice cloned, original timing preserved (Chatterbox Multilingual v3).
 
@@ -867,7 +995,10 @@ Knobs: fit_to_timing (on = lock each line into its SRT slot), max_stretch (cap b
 
 Each line is synthesized with the cloned voice and placed at its SRT timestamp, so the output lines up with your video.
 
-chatterbox-voice-clone
+</details>
+
+<details>
+<summary><b>chatterbox-voice-clone</b></summary>
 
 TTS + VOICE CLONE (Chatterbox Multilingual v3, 23 languages).
 
@@ -879,7 +1010,9 @@ Tip: leave 'Reference voice' unconnected to use the model's default voice.
 
 First run loads the model (pre-baked at boot, a few seconds).
 
-Models in this bundle
+</details>
+
+**Models in this bundle**
 
 - [Chatterbox Multilingual v3](https://huggingface.co/ResembleAI/chatterbox)
 
