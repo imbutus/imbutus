@@ -18,7 +18,7 @@
 
 After registration, top up your balance to the activation threshold. Once reached, your account activates automatically. The required amount may increase over time — activate early.
 
-Minimum activation balance: $16 (will grow, don't be late)
+Minimum activation balance: $18 (will grow, don't be late)
 
 ## LLM
 
@@ -45,16 +45,17 @@ The model list is curated intentionally. Four reasons:
 
 #### Cheap
 
-- [huihui-ai/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated) — Most affordable yet capable model. Great for saving costs and running autonomous agents. · 64K ctx · reasoning · image input
-- [huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated) — Upgraded 9B — newest Claude distillation (Mythos-5), up to 1M-token context, image input, abliterated. Affordable and capable. · 64K ctx · reasoning · image input
+- [huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwythos-9B-Claude-Mythos-5-1M-abliterated) — Upgraded 9B — newest Claude distillation (Mythos-5), up to 1M-token context, image input, abliterated. Affordable and capable. · 256K ctx · reasoning · image input
 
 #### General
 
-- [huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated) — Middle ground — smart and capable without breaking the bank. · 128K ctx · reasoning · image input
+- [huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.6-35B-A3B-Claude-4.7-Opus-abliterated) — Middle ground — smart and capable without breaking the bank. · 256K ctx · reasoning · image input
+- [huihui-ai/Huihui-Qwen3.8-27B-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated) — Newest generation — Qwen3.8 dense 27B, image input, 262k context, abliterated. Takes longer before it answers: it reasons at maximum effort by default, trading speed for depth. · 256K ctx · reasoning · image input
+- [orcarouter/Qwen3.8-27B-Uncensored-FP8](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-FP8) — Same Qwen3.8 generation as above, quantized to FP8 — half as much to download, so it is ready to chat in about 7 minutes instead of 10, and costs a little less per hour. Image input, 262k context, abliterated. · 256K ctx · reasoning · image input
 
 #### Coding
 
-- [imbutus/YuYu1015-Ornith-1.0-35B-abliterated](https://huggingface.co/imbutus/YuYu1015-Ornith-1.0-35B-abliterated) — Alternative 35B — Ornith 1.0, abliterated and multimodal. Full-precision quality on a single GPU. · 128K ctx · reasoning · image input
+- [imbutus/YuYu1015-Ornith-1.0-35B-abliterated](https://huggingface.co/imbutus/YuYu1015-Ornith-1.0-35B-abliterated) — Alternative 35B — Ornith 1.0, abliterated and multimodal. Full-precision quality on a single GPU. · 256K ctx · reasoning · image input
 - [huihui-ai/Huihui-Qwen3-Coder-Next-abliterated](https://huggingface.co/huihui-ai/Huihui-Qwen3-Coder-Next-abliterated) — Most powerful coding-specialized model. Use for programming and code generation. · 256K ctx · no reasoning
 
 New models are added over time. Every model can be found on Hugging Face by the same name.
@@ -160,13 +161,1037 @@ Each bundle is one GPU pod with its own models and ready-to-run workflows. You r
 
 ---
 
+##### MiniMax H3 · Bundle · Partly freed
+
+Generates video with native stereo audio — dialogue, sound effects and music are produced together with the picture in a single pass, not dubbed on afterwards. Text, image or reference-driven: lock a character, style, motion, camera move or voice from up to 9 images, 3 videos and 3 audio clips.
+
+MiniMax's moderation runs on their hosted API and is not part of the open weights, so nothing filters your prompts here — but what the base model itself was trained to refuse is undocumented and untested by us.
+
+ComfyUI workflow: [MiniMaxDirector](https://github.com/imbutus/ComfyUI-MiniMaxDirector)
+
+**Ready-to-run workflows**
+
+<details>
+<summary><b>minimaxh3-director</b></summary>
+
+**MiniMaxDirector**
+
+**Speed — one toggle.** The **Turbo** switch in the *Speed* group picks the render mode;
+nothing else in the graph changes.
+
+
+| Turbo | steps | sampler | LoRA | for |
+| --- | --- | --- | --- | --- |
+| off | 20 | `res_multistep` | none | the take you keep |
+| on | 4 | `euler` | `minimax_h3_ref2v_turbo_4step_v0.1` | drafts, about a fifth of the GPU time |
+
+
+The turbo LoRA is [lightx2v's Ref2VA 4-step distillation](https://huggingface.co/lightx2v/Minimax-h3-Turbo)
+(docs: [ModelTC/Minimax-H3-Turbo](https://github.com/ModelTC/Minimax-H3-Turbo)). It is distilled
+for **4 steps** at 544p on the shifts H3 already defaults to (video 12 / audio 3), so leave
+strength at **1.0**, the scheduler on **simple**, and the step count where the toggle puts it.
+
+Ref2VA turbo is a **v0.1 preview** — audio and fast motion are its weak spots, and the
+distillation was trained against the bf16 base while this bundle runs the pruned int8 one.
+Switch Turbo off for a final render.
+
+---
+
+Lay out shots on the **Director** node's timeline; it compiles them into the single
+structured prompt MiniMax H3 reads, and keeps the clip on a length H3 accepts
+(`length % 17 == 5` at 24 fps).
+
+**Why that rule:** the model denoises a latent whose time axis is a row of slots, and the
+video VAE packs 17 frames into 5 of them (after a 5-frame head worth 2). A length off the
+lattice would need a fraction of a slot. So 124 f is legal, 130 f is not, and only 8s,
+25s and 42s land on whole seconds.
+
+• Two panels beside the director show what was built and what the linter thinks, both
+updating as you type rather than after a run -- a warning that arrives after the
+render arrives after the cost.
+• Drop an image on a shot with **Add Image**; it becomes `<Picture 1>` automatically.
+• Models: the H3 bundle (ref2va unet, Qwen3-VL text encoder, video + audio VAEs).
+• The title bar carries the pack version and build date at its right end.
+
+The three prompt buttons
+
+
+| Button | Track | Makes |
+| --- | --- | --- |
+| Add Video Prompt | MAIN | what happens on screen |
+| Add Sound Prompt | AUDIO | what is heard -- H3 generates it, no file |
+| Add Camera Prompt | CAMERA | how the camera moves |
+
+
+**Add Image / Add Audio / Add Video** attach a real file instead, and the prose is given
+a `<Picture n>` / `<Audio n>` / `<Video n>` token pointing at it. With a block selected that
+carries no file yet, the file lands on that block; otherwise it gets a block of its own.
+
+An attached **audio or video takes the span it actually runs for** -- the file is measured
+before its block is placed -- bounded by the block after it and by the end of the clip.
+
+**Files**, under the transport row beneath the tracks, opens the list of every file the
+clip carries -- the ones on blocks, with the token they compile to, and the ones on no
+block at all, shown dashed.
+
+Its **+ file** adds a file the clip carries with no moment of its own -- any of the three
+kinds, taken from the file. A block says "this stretch of the video is about this file" and
+compiles as `(appears in [Shot n])`; a face to be carried onto whoever is on screen is about
+no stretch, and putting it on a block cuts the clip at a seam the model then acts on. An
+unplaced file is numbered with the rest, described on a card, and written into any prompt by
+its chip. Drag it out of the list onto a track and it becomes an ordinary block at the frame
+you dropped it; `x` takes it off the clip. Every chip drags, placed or not: an unplaced file
+**moves** onto the track, one already on a block is **copied**, which is how the same
+photograph is used in two shots without going back to disk for it.
+
+Copying, and the keyboard
+
+**Clear** empties the piece: every block, the global prompt, the music and every card on
+WHO & WHAT. One undo step puts the timeline back; the cards do not come with it.
+
+
+| Key | Does |
+| --- | --- |
+| `Cmd/Ctrl+A` | select every block on every track |
+| `Delete` | remove the selected blocks |
+| `S` | split them at the playhead |
+| `Cmd/Ctrl+C` · `Cmd/Ctrl+V` | copy the selection, paste it at the playhead keeping its spacing |
+| `Cmd/Ctrl+Z` | undo |
+
+
+The playhead
+
+The red line is where every Add button puts its block -- click the empty part of a track
+to move it, or drag the scrubber. If it is standing inside a block there is no room, so
+the new one goes on the end instead.
+
+• Dragging a block or its edge **snaps** to the playhead and to the edge of every other
+block, on any track, within a few pixels -- so a cue can start exactly where a shot does.
+• **S** cuts the selected blocks in two at the playhead. The second half keeps the prose
+and drops any attached file, so the same picture is never in the prompt twice.
+• Zooming with `+` / `-` recentres the view on it.
+
+The clip settings, left to right
+
+
+| Field | What it does |
+| --- | --- |
+| `duration` | Length of the whole piece, **in frames**. Type anything and it snaps up to the lattice; the arrows step a whole slot. Zero or empty means the clip follows its content. Shortening it brings the tracks inside: the block nearest the end loses its overhang, one that no longer starts inside the clip is squeezed to ten frames and the block in front gives up that much, and a block with nowhere left to stand is removed -- its file staying on the clip, in the Files list. |
+| `= ... s` | The same length in seconds. Read-only -- see below. |
+| `frame rate` | Always 24. H3 has no other rate, so this is shown, never chosen. |
+| `width` / `height` | Output resolution, in multiples of 32. Mirrors of the node's own widgets. |
+| `default resize` | How large a reference picture is sent to the model, for every picture that does not answer for itself on its own FILE row. `match` scales them to the output size; `max` keeps them larger, which holds a face or a logo together better and costs more time. |
+| `renders ...` | Speaks only when rounding changed the number: `renders 124 f = 5.17s · 120 f rounded up`. Silent when what you typed is what H3 renders, which is now the ordinary case. |
+
+
+A block that grows the clip -- added, dragged past the end, or given a longer `length` --
+takes the lattice padding itself, so the timeline is exactly what will be generated and no
+frame of the output is left without a shot describing it. The editor opens at `fit`, with
+the whole clip on screen.
+
+The three tabs
+
+The panel under the toolbar shows one of three things, and remembers which one across a
+reload, along with the block that was selected: **TIMELINE** (the tracks and the selected block's fields), **WHO & WHAT** (one card
+per thing the prompt names, with the count on the tab) and **GLOBAL** (the two clip-wide
+prompt boxes).
+
+The node is exactly as tall as whatever panel is open -- nothing here is a fixed height that
+clips. The card list is the one exception: drag the grip in its bottom-right corner, or the
+node's own corner while WHO & WHAT is open, and the height you set is stored on the node and
+comes back with the workflow.
+
+The segment panel, under the timeline
+
+Select a block first -- with nothing selected there is nothing to edit and the fields are
+not on screen. Everything here edits that block.
+
+
+| Field | What it does |
+| --- | --- |
+| `SEGMENT PROMPT` | What happens in this block. On MAIN it becomes the shot's sentence; on AUDIO the sound; on CAMERA a note added to the move. |
+| `start` / `end` / `length` | The block's span **in frames**. Editing `end` moves the right edge and leaves the start alone -- the same edit as dragging the right grip. |
+| `line` / faces / `how` / `language` | MAIN blocks only. One row per spoken line, **+ line** for another -- see below. |
+| `off-screen` / `carries over` | Two switches on a dialogue row: a voiceover, and a line that runs past the cut. |
+| `enter with` / `on-screen text` | MAIN blocks. How the cut into this shot is written, and any words visible in frame. |
+| `SUBJECTS` chips | One chip per numbered card, thumbnail and token, then one per file on the timeline (`<Picture n>`, `<Audio n>`, `<Video n>`) drawn dashed. Click it and the token is written into `SEGMENT PROMPT` at the caret. |
+| `camera` / `amplitude` / `speed` | CAMERA blocks only. Motion type, how far the framing travels, how fast. |
+| `describes` / `used as` / `keep file` | Blocks carrying a file only. See the next section. |
+| `set width & height` | Picture blocks only. Takes the clip's `width` / `height` from that file's resolution, scaled down to a size H3 renders. Nothing else moves those two fields. |
+| `detach media` | Removes the file, keeps the block and its prose. |
+
+
+**Select several blocks** and the panel becomes a selection panel: only the fields that
+apply to all of them (`camera` / `amplitude` / `speed`, `enter with`, `used as`,
+`keep file`), each starting on *leave as is*. `same length` and **close the gaps** are
+always there -- a frame count means the same thing on every track. For shots there are
+two more: **merge into one shot**, which is what MiniMax asks for when a cut only changes
+the distance, and **make the speech continuous**, which writes one sentence across the
+cuts.
+
+Frames first, seconds after, everywhere: the playhead clock reads `48 f = 2.00s` and the
+selected block `Start: 0 f | End: 96 f | Length: 96 f = 4.00s`. Frames are what the
+document stores and what H3 is given; seconds are the translation. Every number box -- `start`, `end`, `length`, `duration`, `width`, `height`, `same length` -- takes effect on Enter or when you leave it, not as you type, so one can be cleared and retyped without the half-finished number being read and refused; what lands in the box afterwards is what was actually set. Enter finishes any field and leaves it, prompt boxes included, and leaving a box flattens what is in it: paste a paragraph and it collapses to one line, because one line is what the compiled prompt carries.
+
+A dialogue row with nothing typed in it dims -- the row and its background both -- because
+the compiler ignores it until it has words. Along a block's bottom edge sit its chips: the
+file it carries (`IMAGE · face.jpg`), and one per transfer taken out of that file,
+`FACE -> SPEAKER`, amber `FACE -> ?` while nobody has been named to receive it.
+
+The **GLOBAL** tab holds the two fields set once for the whole piece:
+
+
+| Field | What it does |
+| --- | --- |
+| `GLOBAL PROMPT` | Style and scene constants for the whole clip. Compiles into the opening of Shot 1. |
+| `GLOBAL MUSIC` | Score only the audience hears, as instrumentation, tempo and dynamics -- not mood words. Empty compiles to `non_diegetic_music: N/A`. |
+
+
+**Paste freely.** Line breaks are structure in the compiled prompt -- `subject_definitions` and `retention_analysis` list one entry per line, and a blank line starts a new field -- so every box is flattened to a single line on the way out. A paragraph pasted from a document arrives as one sentence, not as a subject nobody wrote.
+
+**Why seconds are read-only.** Every greyed `= ... s` box is a reading, not an input. A
+second is 24 frames wide, so a block typed as `1.08` came back as 26 frames and was shown
+as `1.08` again -- the number actually set was never on screen. The clip is written in
+seconds and cut in frames, and only one of those can be the field you edit.
+
+Dialogue
+
+H3 makes the voice and the picture in one pass, and the guide's form for it is exact:
+
+`The young woman with a quiet, breathy voice (S1) says: <d>[English] I get off at the next station.</d>`
+
+The editor writes it for you, and splits it the way the work actually splits: **who the
+people are**is written once in the WHO & WHAT tab, and a block only says**who talks and
+what they say**.
+
+**WHO & WHAT** is one card per thing the prompt has to name -- usually a person, but equally
+a costume, a prop, a place or a style, which fill in the same card with the voice row left
+empty. Several cards may point at one file: that is how a single photograph names several
+things, each numbered separately.
+
+`S1…Sn` is a **speaker** -- who says a line; any card with a voice. `<Subject 1…n>` is a
+**subject** -- a person, a costume, a prop, a place, a look the model must keep. A card is
+one only with a file **and** a description; without a file there is nothing for the prompt
+to point at, so it can only be a voice. Both tokens are MiniMax's, and a card can be one,
+the other, or both.
+
+The block's FILE row lists the subjects drawn from that file, one per line, with `edit`
+beside each and **+ another card** underneath -- which is how a single photograph names a
+person, their coat and the room behind them.
+
+**The subject chips write the token for you.** They sit along the bottom of the prompt box
+itself -- every numbered card a chip, its file's thumbnail beside `<Subject 2> suit`;
+clicking one splices the token into the box above it where the caret is, and a chip that
+box already names is lit. GLOBAL PROMPT carries the same strip. Typing the number by
+hand is the alternative, and getting it wrong is silent -- the prompt cites a subject that
+does not exist and nothing on screen says so.
+
+**The files have chips too**, dashed, after the subjects: `<Picture 2> face.jpg`,
+`<Audio 1> voice.mp3`, `<Video 1> clip.mp4`, one per file on the timeline. The compiler
+writes a file's token into its own block's line; pointing at it from anywhere else -- a
+recording the mouth has to follow, a picture a later shot refers back to -- is what these
+are for.
+
+
+| Field | What it does |
+| --- | --- |
+| `name it` | A short name, yours, so the faces on a dialogue row are readable. |
+| `from` | Which file on the timeline this subject is drawn from, and the only place that file is described. The binding is what makes a face and a voice one person; the card then shows the `<Subject n>` badge the prompt will use. |
+| `keep it` | How much of *the subject* survives, compiled as `subject_retention`. Not the block's `keep file`: the photo may be `fully_preserved` while the face taken out of it is an `attribute_transfer` onto somebody else. |
+| `onto` | Who receives that transfer. Shown only for `attribute_transfer`: pick another character or a shot's subject from the list, or type a receiver only the shot describes. Picking a card writes its name and compiles as that card's `<Subject n>`, which is the only way the model knows a person. Empty means the model is told to move a face and never told where. Picking a card folds this one into it: the feature takes no `<Subject n>` of its own, and the transfer is written as its own sentence -- `<Subject 1>'s face comes from <Picture 2> and not from <Picture 1>: ...` -- which is MiniMax's rule for one subject built from several assets, said so that the pronoun cannot bind to the picture instead of the person. Describe the receiver *without* the feature being replaced, its hair included: kept `fully_preserved` including the head it has, the model is told to keep that head and to replace it, and it keeps it -- the report warns about the face. |
+| what it is | For a card with a file. Becomes their line in `subject_definitions`. |
+| how they sound | Age, gender, pitch, timbre, accent, on screen or off. H3 fixes the voice from this, so an empty one is a voice nobody chose and the linter says so. |
+| `motion from` | A second file for the same person, supplying how they move. A still says nothing about a walk. |
+| `voice from` | Take the timbre from a recording instead of describing it. The signal is never copied -- only the voice and delivery are followed. |
+
+
+**A card that is doing nothing looks like it.** A card counts when it names a file *and*
+says what that file is -- that is a `<Subject n>` -- or when it describes a voice something
+actually speaks. Short of either, the compiled prompt is byte-for-byte what it would be
+with no card there, so the card goes flat: transparent, dashed, dimmed, with the reason in
+amber across it and the same line in `report`.
+
+
+| The card says | Because |
+| --- | --- |
+| this card compiles to nothing | no file and no voice: it is neither a subject nor a speaker |
+| nothing is written about `<Picture 1>` yet | a file is picked, but with nothing said about it the card takes no number |
+| nobody speaks this card's lines | it has a voice, and no shot's dialogue row ticks its face |
+| no file: this card gives a voice and nothing else | fine, and deliberate -- a speaker with no photograph |
+
+
+Two badges say the rest. `<Subject n>` is what the prompt will call this card, and a hollow
+`no <Subject>` where it would be means no file was picked. A green `[Shot n]` says where
+the card is heard, which is otherwise only visible from the TIMELINE tab.
+
+**Add** adds a card; **they speak** switches dialogue off for the whole clip --
+every row and every `<d>` at once, cards kept. The voice row goes with them, `voice
+from`included, and so does the`Sn` badge: with nobody speaking a timbre reference
+instructs nothing and the compiler drops it, and no card is called by a speaker number. Describing the same speaker two different
+ways in two shots used to be possible; to the model that reads as two people wearing one
+label.
+
+**On the block:**
+
+
+| Field | What it does |
+| --- | --- |
+| `line` | The words themselves, sent **verbatim** -- never translated, punctuation kept. |
+| faces | Who says it: click a face from WHO & WHAT. Two lit on one row is the guide's `(S1,S2)` -- the same words spoken by both at the same instant. |
+| `how` | How it is performed. Becomes the verb: says, whispers, shouts, answers -- free text, used as written. |
+| `language` | Names the language of the words; it does not translate them. |
+| `off-screen` | A voiceover. Writes MiniMax's exact phrase **and** the clause it requires after every one -- that the lips stay closed. Forget the second half and the model animates a mouth to match. |
+| `carries over` | The line does not finish in this block. `<scenetrans>` on both sides of the cut, or `<cutoff>` when the clip simply ends underneath it. |
+
+
+**+ line** adds another row, so one block can hold a conversation: a line each, spoken in
+turn, compiled as one `<d>` apiece. It goes dead -- dashed and dimmed, with the reason in
+amber -- while a row on the block still has no words, since the compiler ignores that row
+and a second empty one adds a second nothing. The red bin at the end of a row removes it -- the same
+delete button the subject cards carry.
+
+Clicking a face hands the line to that person alone; hold Cmd or Ctrl to add another, and another -- the row says so beside the faces, and any number of them can say the words at once.
+
+Three readings, kept apart on purpose: a **chorus** is one row with two faces, a
+**conversation** is two rows, and an **argument** -- overlapping speech with no agreed
+words -- is neither. Write that one in the segment prompt and put the sound in an AUDIO
+cue; there is nothing for H3 to quote.
+
+Attached files: `used as`, `describes` and `keep file`
+
+**used as** -- what the file is *for*. It decides the task type the summary opens with, and
+the guide wants every relationship named:
+
+
+| Used as | Task type it produces |
+| --- | --- |
+| `reference` | `reference generation` -- guidance for a character, scene, style or camera move |
+| `storyboard` | `reference generation` -- a plan of the framing, not content: *is a storyboard reference for [Shot 1], defining viewpoint, subject placement, and shot order* |
+| `first frame` / `keyframe` / `last frame` | `keyframe completion` -- the image is a concrete frame of the target video, and `retention_analysis` says which |
+| `continue from` | `video continuation` |
+| `edit` | `video editing` |
+
+
+Only `first frame` and `last frame` have an input on the model. `keyframe` is the same idea one step weaker: MiniMax's guide counts it as a frame anchor, but the core node takes exactly two stills -- `first_frame` and `last_frame` -- so a picture that should be a frame in the *middle* has nothing to be plugged into. That block's image travels with the references and the prompt asks for the placement in words -- `<Picture 1> ([Shot 2] keyframe)` where a reference would read `(appears in [Shot 2])`. An end is a guarantee, the middle is a request the model follows loosely.
+
+**A keyframe is fitted to the clip, not the other way round.** A block used as `first frame`
+or `last frame` carries a **`fit`** picker beside `keep file`. `crop`, the default, scales
+the picture and cover-crops it from the centre: proportions survive, an edge is lost.
+`stretch` hands it over untouched, which is what ComfyUI does on its own -- every pixel
+kept, the picture squashed. A picture already of the clip's shape is untouched either way;
+when the shapes disagree the report names both sizes and what it cost. To keep the whole
+picture, give the clip the picture's shape, or attach the file as a `reference` -- that
+path scales without cropping and lets the model compose the rest of the frame around it.
+
+The settings row's `default resize` sizes reference *pictures* only -- a reference video is sized
+by its own rule, a keyframe by `fit` -- so it goes dead on any clip that carries no
+reference picture: only frame anchors, only a video, only sound, or nothing at all. A picture in the Files list counts before it is placed: it reaches the model in the same reference list as one on a block. A picture answers for itself with its own `resize`, offered both on its row in Files and on a block's FILE row -- it belongs to the file, so both write the same thing. The clip's value is only for the pictures that say nothing: `max` on the face you have to keep, `match` on the mood board behind it.
+
+What it trades is detail against time. A reference picture becomes tokens the model reads beside the prompt, and those tokens are re-read at every sampling step -- more pixels, finer detail, more time. `match` shrinks it to about the clip's pixel count: fast, enough for a scene, a style, a mood. `max` allows 2048 px on the short side: slower, and what keeps a face the same face. Neither enlarges a picture or changes its proportions.
+
+**`default resize` does not touch `width` and `height`.** The clip used to take the shape of the first reference picture whenever it said `match`; now a picture block carries **set width & height** beside `detach media`, which does it on request -- for a keyframe too, which is what the crop warning asks for.
+
+An attached audio adds `audio reuse` or `audio reference` depending on its `keep`. Several
+at once combine: `[keyframe completion + video continuation + audio reuse]`.
+
+A segment holding a real file switches the prompt into H3's full-reference format -- six
+sections instead of three -- and gets its own row of fields.
+
+**describes** -- read-only, and there is no box here. What a file *is* is written once, on
+a subject card, and this line shows that card's sentence beside the `<Subject n>` it
+became with a link to the WHO & WHAT tab. Until you add one it reads `nothing describes this
+file yet`, and the linter says the same: an unnamed reference is one H3 has to guess at.
+
+Why not a box on the block? Because a file used to define something is cited *inside* that
+thing's definition rather than given a line of its own -- MiniMax's own rule -- so a second
+box here would have been a field the prompt threw away, which is exactly how it behaved.
+One file, one description.
+
+**keep file** -- how much of the file survives into the video. One per file, always; it
+also sits on the block itself, bottom right. A subject card drawn `from` this file carries
+its own `keep it` for the thing, which may differ. The sentence it produces lands in
+`retention_analysis`, as
+`<Picture 1> (appears in [Shot 2]): fully_preserved - the raccoon, ...`
+
+
+| Value | Means |
+| --- | --- |
+| `fully_preserved` | copy it -- same subject, same look, unchanged |
+| `partially_preserved` | keep the subject, let pose, angle or lighting change |
+| `attribute_transfer` | take one trait -- a face, a colour, a texture -- onto something else |
+| `weak_reference` | loose inspiration only: style, palette, grade, nothing literal |
+
+
+These are H3's own words, not ours. It reads them as instructions, so a wrong one is worse
+than a vague `describes`: `fully_preserved` on a style reference asks the model to reproduce
+the whole frame.
+
+**An audio file is graded in its own words**, because H3's format defines a different set
+for sound: `fully_copy` (reproduce this recording), `partially_copy`, `reference` (only the
+timbre or texture is followed), `weak_reference`. The picker follows the file, so there is
+nothing to get wrong.
+
+**No marker copies the file's samples into the clip.** A reference audio is encoded into
+the conditioning, and the soundtrack that comes back is the one the sampler produced and
+`VAEDecodeAudio` decoded -- `fully_copy` asks H3 to re-perform the recording, and how close
+it lands is the model's business. To ship the recording itself, wire it into `CreateVideo`
+in place of the decoded audio.
+
+**A card that reaches the prompt as nothing** is called out too: a card names a file, which
+makes it a `<Subject n>`, or describes a voice, which becomes the words in front of `(S1)`.
+With neither, the compiled prompt is byte-for-byte what it would be with no card there, and
+the row on screen says so. The reverse is called out too: a voice nobody speaks with, where
+no line names that card's `S` -- an instruction about how somebody sounds, applied to
+nothing.
+
+**Subjects live on subject cards.** Point a card's `from` at a file and it becomes a
+`<Subject n>` of its own, tracked apart from the picture it came from:
+
+`<Subject 1> is the man's face, from <Picture 2>.`
+
+That separation is what a face swap needs. The picture stays a `weak_reference` -- you do
+not want the whole frame back -- while the card's `keep it` is `attribute_transfer` onto
+the person in another shot. The shot then mentions `<Subject 1>` rather than `<Picture 2>`,
+because naming both asks for two different things at once.
+
+`onto` on the card names who receives the face, and the block carrying the picture shows
+the move as a chip. A picture whose only job is defining somebody gets no `<Picture n>`
+entry of its own: MiniMax's guide asks for it cited inside the `<Subject n>` line instead.
+An image used as a `first frame` or `keyframe` keeps its entry either way -- it is a real
+frame of the video, whoever else it defines.
+
+The block's FILE row shows that definition read-only, labelled with the `<Subject n>` it
+became and linked to the card. When the role does keep the file an entry -- a frame anchor,
+an edit source -- the card's sentence fills that in as well.
+
+Camera moves
+
+A move is three choices, the way MiniMax documents it: **motion type**, **amplitude**,
+**speed**. H3 reads prose, not enum values, so the three become one sentence.
+
+
+| Motion | Sentence sent to the model |
+| --- | --- |
+| `static` | The camera holds a static shot. |
+| `zoom_in` / `zoom_out` | The camera zooms in / out. |
+| `dolly_in` / `dolly_out` | The camera pushes in / pulls out. |
+| `pan_left` / `pan_right` | The camera pans left / right. |
+| `truck_left` / `truck_right` | The camera trucks left / right. |
+| `tilt_up` / `tilt_down` | The camera tilts up / down. |
+| `pedestal_up` / `pedestal_down` | The camera rises straight up / lowers straight down. |
+| `orbit` | The camera moves in an arc around the subject. |
+| `tracking` | The camera follows the moving subject. |
+| `pov` | The camera takes the subject's point of view. |
+| `roll_cw` / `roll_ccw` | The camera rolls clockwise / counterclockwise. |
+| `handheld` / `shake_strongly` | The camera shakes slightly / strongly. |
+
+
+A zoom and a push-in are not the same move: a zoom changes the focal length with the
+camera standing still, a push-in moves the camera body. The model knows the difference.
+
+`amplitude` (small / large) and `speed` (slow / fast) are added when set -- *The camera
+pushes in with small amplitude at slow speed.* Both default to medium and normal, which
+the guide writes by leaving them out, so those options add nothing on purpose.
+
+A note typed into a camera segment is appended after the sentence, so write it as a
+continuation rather than a sentence of its own. Camera work is its own block because a
+move can straddle a cut -- merging it into the shot line would silently pick a side.
+
+What the linter now checks
+
+`report` warns, never refuses: a description outside the **350-500 words** MiniMax asks
+for on a generation task; two adjacent shots that describe the same thing at a different
+framing (the guide asks for a camera move, not a cut); an empty AUDIO track, because
+`overall_soundscape: N/A` tells H3 the clip is **completely silent**; a voice reference
+asked to be copied; a line marked `carries over` with nothing after it; and a guessed word
+where the guide wants `[unclear]`.
+
+</details>
+
+<details>
+<summary><b>minimaxh3-director-advanced</b></summary>
+
+**MiniMaxDirector — Advanced**
+
+**Upscale — the second stage.** The **Upscale** switch in the *Upscale* group renders the
+clip as usual, then enlarges the latent and refines it. Off, the graph is exactly the plain
+director workflow and nothing below runs.
+
+The order matters: render first, look at it, and only then pay for the resolution. Flip Upscale
+on and queue the same graph again — nothing upstream changed, so ComfyUI serves stage 1 from its
+cache and only the upscale and the refine pass cost anything. That cache lives in the running
+ComfyUI, so a restarted pod re-renders stage 1 (identically — same seed, same graph).
+
+
+|  | what happens |
+| --- | --- |
+| off | one sampling pass at the canvas size, straight to the video |
+| on | that same pass, then a latent upscale and a short refine at the bigger size |
+
+
+**target_megapixels** is the size you land on, not a multiplier — the canvas defaults to
+1344×768, which is 1.03 MP, so the default 2.0 is a bit under 1.5× per side. It must be larger
+than the canvas; the node refuses to shrink. **align 2** is the model's real constraint (the DiT
+patches the latent 2×2, so latent dimensions are even and pixels are multiples of 32). A coarser
+grid rounds the aspect ratio away — at align 32 a 16:9 request comes back 2:1.
+
+The refine pass is an 8-step schedule split at step 4, so it starts at sigma 0.9231 and takes 4
+steps down. That is a real second render at the larger size — **it costs time and VRAM, not just
+the 691MB upscaler**. Fewer refine steps is cheaper and softer; more is slower and sharper.
+
+The upscaler is [LBH-123-AI's H3 latent upscaler](https://huggingface.co/LBH-123-AI/Minimax_h3_latent_Upscaler),
+working directly on H3's 24-channel latents so nothing round-trips through the 5B VAE. Days old
+at the time of writing, and unproven at our sizes — check the result before trusting it with a
+long clip.
+
+---
+
+**Speed — one toggle.** The **Turbo** switch in the *Speed* group picks the render mode;
+nothing else in the graph changes.
+
+
+| Turbo | steps | sampler | LoRA | for |
+| --- | --- | --- | --- | --- |
+| off | 20 | `res_multistep` | none | the take you keep |
+| on | 4 | `euler` | `minimax_h3_ref2v_turbo_4step_v0.1` | drafts, about a fifth of the GPU time |
+
+
+The turbo LoRA is [lightx2v's Ref2VA 4-step distillation](https://huggingface.co/lightx2v/Minimax-h3-Turbo)
+(docs: [ModelTC/Minimax-H3-Turbo](https://github.com/ModelTC/Minimax-H3-Turbo)). It is distilled
+for **4 steps** at 544p on the shifts H3 already defaults to (video 12 / audio 3), so leave
+strength at **1.0**, the scheduler on **simple**, and the step count where the toggle puts it.
+
+Ref2VA turbo is a **v0.1 preview** — audio and fast motion are its weak spots, and the
+distillation was trained against the bf16 base while this bundle runs the pruned int8 one.
+Switch Turbo off for a final render.
+
+---
+
+Lay out shots on the **Director** node's timeline; it compiles them into the single
+structured prompt MiniMax H3 reads, and keeps the clip on a length H3 accepts
+(`length % 17 == 5` at 24 fps).
+
+**Why that rule:** the model denoises a latent whose time axis is a row of slots, and the
+video VAE packs 17 frames into 5 of them (after a 5-frame head worth 2). A length off the
+lattice would need a fraction of a slot. So 124 f is legal, 130 f is not, and only 8s,
+25s and 42s land on whole seconds.
+
+• Two panels beside the director show what was built and what the linter thinks, both
+updating as you type rather than after a run -- a warning that arrives after the
+render arrives after the cost.
+• Drop an image on a shot with **Add Image**; it becomes `<Picture 1>` automatically.
+• Models: the H3 bundle (ref2va unet, Qwen3-VL text encoder, video + audio VAEs).
+• The title bar carries the pack version and build date at its right end.
+
+The three prompt buttons
+
+
+| Button | Track | Makes |
+| --- | --- | --- |
+| Add Video Prompt | MAIN | what happens on screen |
+| Add Sound Prompt | AUDIO | what is heard -- H3 generates it, no file |
+| Add Camera Prompt | CAMERA | how the camera moves |
+
+
+**Add Image / Add Audio / Add Video** attach a real file instead, and the prose is given
+a `<Picture n>` / `<Audio n>` / `<Video n>` token pointing at it. With a block selected that
+carries no file yet, the file lands on that block; otherwise it gets a block of its own.
+
+An attached **audio or video takes the span it actually runs for** -- the file is measured
+before its block is placed -- bounded by the block after it and by the end of the clip.
+
+**Files**, under the transport row beneath the tracks, opens the list of every file the
+clip carries -- the ones on blocks, with the token they compile to, and the ones on no
+block at all, shown dashed.
+
+Its **+ file** adds a file the clip carries with no moment of its own -- any of the three
+kinds, taken from the file. A block says "this stretch of the video is about this file" and
+compiles as `(appears in [Shot n])`; a face to be carried onto whoever is on screen is about
+no stretch, and putting it on a block cuts the clip at a seam the model then acts on. An
+unplaced file is numbered with the rest, described on a card, and written into any prompt by
+its chip. Drag it out of the list onto a track and it becomes an ordinary block at the frame
+you dropped it; `x` takes it off the clip. Every chip drags, placed or not: an unplaced file
+**moves** onto the track, one already on a block is **copied**, which is how the same
+photograph is used in two shots without going back to disk for it.
+
+Copying, and the keyboard
+
+**Clear** empties the piece: every block, the global prompt, the music and every card on
+WHO & WHAT. One undo step puts the timeline back; the cards do not come with it.
+
+
+| Key | Does |
+| --- | --- |
+| `Cmd/Ctrl+A` | select every block on every track |
+| `Delete` | remove the selected blocks |
+| `S` | split them at the playhead |
+| `Cmd/Ctrl+C` · `Cmd/Ctrl+V` | copy the selection, paste it at the playhead keeping its spacing |
+| `Cmd/Ctrl+Z` | undo |
+
+
+The playhead
+
+The red line is where every Add button puts its block -- click the empty part of a track
+to move it, or drag the scrubber. If it is standing inside a block there is no room, so
+the new one goes on the end instead.
+
+• Dragging a block or its edge **snaps** to the playhead and to the edge of every other
+block, on any track, within a few pixels -- so a cue can start exactly where a shot does.
+• **S** cuts the selected blocks in two at the playhead. The second half keeps the prose
+and drops any attached file, so the same picture is never in the prompt twice.
+• Zooming with `+` / `-` recentres the view on it.
+
+The clip settings, left to right
+
+
+| Field | What it does |
+| --- | --- |
+| `duration` | Length of the whole piece, **in frames**. Type anything and it snaps up to the lattice; the arrows step a whole slot. Zero or empty means the clip follows its content. Shortening it brings the tracks inside: the block nearest the end loses its overhang, one that no longer starts inside the clip is squeezed to ten frames and the block in front gives up that much, and a block with nowhere left to stand is removed -- its file staying on the clip, in the Files list. |
+| `= ... s` | The same length in seconds. Read-only -- see below. |
+| `frame rate` | Always 24. H3 has no other rate, so this is shown, never chosen. |
+| `width` / `height` | Output resolution, in multiples of 32. Mirrors of the node's own widgets. |
+| `default resize` | How large a reference picture is sent to the model, for every picture that does not answer for itself on its own FILE row. `match` scales them to the output size; `max` keeps them larger, which holds a face or a logo together better and costs more time. |
+| `renders ...` | Speaks only when rounding changed the number: `renders 124 f = 5.17s · 120 f rounded up`. Silent when what you typed is what H3 renders, which is now the ordinary case. |
+
+
+A block that grows the clip -- added, dragged past the end, or given a longer `length` --
+takes the lattice padding itself, so the timeline is exactly what will be generated and no
+frame of the output is left without a shot describing it. The editor opens at `fit`, with
+the whole clip on screen.
+
+The three tabs
+
+The panel under the toolbar shows one of three things, and remembers which one across a
+reload, along with the block that was selected: **TIMELINE** (the tracks and the selected block's fields), **WHO & WHAT** (one card
+per thing the prompt names, with the count on the tab) and **GLOBAL** (the two clip-wide
+prompt boxes).
+
+The node is exactly as tall as whatever panel is open -- nothing here is a fixed height that
+clips. The card list is the one exception: drag the grip in its bottom-right corner, or the
+node's own corner while WHO & WHAT is open, and the height you set is stored on the node and
+comes back with the workflow.
+
+The segment panel, under the timeline
+
+Select a block first -- with nothing selected there is nothing to edit and the fields are
+not on screen. Everything here edits that block.
+
+
+| Field | What it does |
+| --- | --- |
+| `SEGMENT PROMPT` | What happens in this block. On MAIN it becomes the shot's sentence; on AUDIO the sound; on CAMERA a note added to the move. |
+| `start` / `end` / `length` | The block's span **in frames**. Editing `end` moves the right edge and leaves the start alone -- the same edit as dragging the right grip. |
+| `line` / faces / `how` / `language` | MAIN blocks only. One row per spoken line, **+ line** for another -- see below. |
+| `off-screen` / `carries over` | Two switches on a dialogue row: a voiceover, and a line that runs past the cut. |
+| `enter with` / `on-screen text` | MAIN blocks. How the cut into this shot is written, and any words visible in frame. |
+| `SUBJECTS` chips | One chip per numbered card, thumbnail and token, then one per file on the timeline (`<Picture n>`, `<Audio n>`, `<Video n>`) drawn dashed. Click it and the token is written into `SEGMENT PROMPT` at the caret. |
+| `camera` / `amplitude` / `speed` | CAMERA blocks only. Motion type, how far the framing travels, how fast. |
+| `describes` / `used as` / `keep file` | Blocks carrying a file only. See the next section. |
+| `set width & height` | Picture blocks only. Takes the clip's `width` / `height` from that file's resolution, scaled down to a size H3 renders. Nothing else moves those two fields. |
+| `detach media` | Removes the file, keeps the block and its prose. |
+
+
+**Select several blocks** and the panel becomes a selection panel: only the fields that
+apply to all of them (`camera` / `amplitude` / `speed`, `enter with`, `used as`,
+`keep file`), each starting on *leave as is*. `same length` and **close the gaps** are
+always there -- a frame count means the same thing on every track. For shots there are
+two more: **merge into one shot**, which is what MiniMax asks for when a cut only changes
+the distance, and **make the speech continuous**, which writes one sentence across the
+cuts.
+
+Frames first, seconds after, everywhere: the playhead clock reads `48 f = 2.00s` and the
+selected block `Start: 0 f | End: 96 f | Length: 96 f = 4.00s`. Frames are what the
+document stores and what H3 is given; seconds are the translation. Every number box -- `start`, `end`, `length`, `duration`, `width`, `height`, `same length` -- takes effect on Enter or when you leave it, not as you type, so one can be cleared and retyped without the half-finished number being read and refused; what lands in the box afterwards is what was actually set. Enter finishes any field and leaves it, prompt boxes included, and leaving a box flattens what is in it: paste a paragraph and it collapses to one line, because one line is what the compiled prompt carries.
+
+A dialogue row with nothing typed in it dims -- the row and its background both -- because
+the compiler ignores it until it has words. Along a block's bottom edge sit its chips: the
+file it carries (`IMAGE · face.jpg`), and one per transfer taken out of that file,
+`FACE -> SPEAKER`, amber `FACE -> ?` while nobody has been named to receive it.
+
+The **GLOBAL** tab holds the two fields set once for the whole piece:
+
+
+| Field | What it does |
+| --- | --- |
+| `GLOBAL PROMPT` | Style and scene constants for the whole clip. Compiles into the opening of Shot 1. |
+| `GLOBAL MUSIC` | Score only the audience hears, as instrumentation, tempo and dynamics -- not mood words. Empty compiles to `non_diegetic_music: N/A`. |
+
+
+**Paste freely.** Line breaks are structure in the compiled prompt -- `subject_definitions` and `retention_analysis` list one entry per line, and a blank line starts a new field -- so every box is flattened to a single line on the way out. A paragraph pasted from a document arrives as one sentence, not as a subject nobody wrote.
+
+**Why seconds are read-only.** Every greyed `= ... s` box is a reading, not an input. A
+second is 24 frames wide, so a block typed as `1.08` came back as 26 frames and was shown
+as `1.08` again -- the number actually set was never on screen. The clip is written in
+seconds and cut in frames, and only one of those can be the field you edit.
+
+Dialogue
+
+H3 makes the voice and the picture in one pass, and the guide's form for it is exact:
+
+`The young woman with a quiet, breathy voice (S1) says: <d>[English] I get off at the next station.</d>`
+
+The editor writes it for you, and splits it the way the work actually splits: **who the
+people are**is written once in the WHO & WHAT tab, and a block only says**who talks and
+what they say**.
+
+**WHO & WHAT** is one card per thing the prompt has to name -- usually a person, but equally
+a costume, a prop, a place or a style, which fill in the same card with the voice row left
+empty. Several cards may point at one file: that is how a single photograph names several
+things, each numbered separately.
+
+`S1…Sn` is a **speaker** -- who says a line; any card with a voice. `<Subject 1…n>` is a
+**subject** -- a person, a costume, a prop, a place, a look the model must keep. A card is
+one only with a file **and** a description; without a file there is nothing for the prompt
+to point at, so it can only be a voice. Both tokens are MiniMax's, and a card can be one,
+the other, or both.
+
+The block's FILE row lists the subjects drawn from that file, one per line, with `edit`
+beside each and **+ another card** underneath -- which is how a single photograph names a
+person, their coat and the room behind them.
+
+**The subject chips write the token for you.** They sit along the bottom of the prompt box
+itself -- every numbered card a chip, its file's thumbnail beside `<Subject 2> suit`;
+clicking one splices the token into the box above it where the caret is, and a chip that
+box already names is lit. GLOBAL PROMPT carries the same strip. Typing the number by
+hand is the alternative, and getting it wrong is silent -- the prompt cites a subject that
+does not exist and nothing on screen says so.
+
+**The files have chips too**, dashed, after the subjects: `<Picture 2> face.jpg`,
+`<Audio 1> voice.mp3`, `<Video 1> clip.mp4`, one per file on the timeline. The compiler
+writes a file's token into its own block's line; pointing at it from anywhere else -- a
+recording the mouth has to follow, a picture a later shot refers back to -- is what these
+are for.
+
+
+| Field | What it does |
+| --- | --- |
+| `name it` | A short name, yours, so the faces on a dialogue row are readable. |
+| `from` | Which file on the timeline this subject is drawn from, and the only place that file is described. The binding is what makes a face and a voice one person; the card then shows the `<Subject n>` badge the prompt will use. |
+| `keep it` | How much of *the subject* survives, compiled as `subject_retention`. Not the block's `keep file`: the photo may be `fully_preserved` while the face taken out of it is an `attribute_transfer` onto somebody else. |
+| `onto` | Who receives that transfer. Shown only for `attribute_transfer`: pick another character or a shot's subject from the list, or type a receiver only the shot describes. Picking a card writes its name and compiles as that card's `<Subject n>`, which is the only way the model knows a person. Empty means the model is told to move a face and never told where. Picking a card folds this one into it: the feature takes no `<Subject n>` of its own, and the transfer is written as its own sentence -- `<Subject 1>'s face comes from <Picture 2> and not from <Picture 1>: ...` -- which is MiniMax's rule for one subject built from several assets, said so that the pronoun cannot bind to the picture instead of the person. Describe the receiver *without* the feature being replaced, its hair included: kept `fully_preserved` including the head it has, the model is told to keep that head and to replace it, and it keeps it -- the report warns about the face. |
+| what it is | For a card with a file. Becomes their line in `subject_definitions`. |
+| how they sound | Age, gender, pitch, timbre, accent, on screen or off. H3 fixes the voice from this, so an empty one is a voice nobody chose and the linter says so. |
+| `motion from` | A second file for the same person, supplying how they move. A still says nothing about a walk. |
+| `voice from` | Take the timbre from a recording instead of describing it. The signal is never copied -- only the voice and delivery are followed. |
+
+
+**A card that is doing nothing looks like it.** A card counts when it names a file *and*
+says what that file is -- that is a `<Subject n>` -- or when it describes a voice something
+actually speaks. Short of either, the compiled prompt is byte-for-byte what it would be
+with no card there, so the card goes flat: transparent, dashed, dimmed, with the reason in
+amber across it and the same line in `report`.
+
+
+| The card says | Because |
+| --- | --- |
+| this card compiles to nothing | no file and no voice: it is neither a subject nor a speaker |
+| nothing is written about `<Picture 1>` yet | a file is picked, but with nothing said about it the card takes no number |
+| nobody speaks this card's lines | it has a voice, and no shot's dialogue row ticks its face |
+| no file: this card gives a voice and nothing else | fine, and deliberate -- a speaker with no photograph |
+
+
+Two badges say the rest. `<Subject n>` is what the prompt will call this card, and a hollow
+`no <Subject>` where it would be means no file was picked. A green `[Shot n]` says where
+the card is heard, which is otherwise only visible from the TIMELINE tab.
+
+**Add** adds a card; **they speak** switches dialogue off for the whole clip --
+every row and every `<d>` at once, cards kept. The voice row goes with them, `voice
+from`included, and so does the`Sn` badge: with nobody speaking a timbre reference
+instructs nothing and the compiler drops it, and no card is called by a speaker number. Describing the same speaker two different
+ways in two shots used to be possible; to the model that reads as two people wearing one
+label.
+
+**On the block:**
+
+
+| Field | What it does |
+| --- | --- |
+| `line` | The words themselves, sent **verbatim** -- never translated, punctuation kept. |
+| faces | Who says it: click a face from WHO & WHAT. Two lit on one row is the guide's `(S1,S2)` -- the same words spoken by both at the same instant. |
+| `how` | How it is performed. Becomes the verb: says, whispers, shouts, answers -- free text, used as written. |
+| `language` | Names the language of the words; it does not translate them. |
+| `off-screen` | A voiceover. Writes MiniMax's exact phrase **and** the clause it requires after every one -- that the lips stay closed. Forget the second half and the model animates a mouth to match. |
+| `carries over` | The line does not finish in this block. `<scenetrans>` on both sides of the cut, or `<cutoff>` when the clip simply ends underneath it. |
+
+
+**+ line** adds another row, so one block can hold a conversation: a line each, spoken in
+turn, compiled as one `<d>` apiece. It goes dead -- dashed and dimmed, with the reason in
+amber -- while a row on the block still has no words, since the compiler ignores that row
+and a second empty one adds a second nothing. The red bin at the end of a row removes it -- the same
+delete button the subject cards carry.
+
+Clicking a face hands the line to that person alone; hold Cmd or Ctrl to add another, and another -- the row says so beside the faces, and any number of them can say the words at once.
+
+Three readings, kept apart on purpose: a **chorus** is one row with two faces, a
+**conversation** is two rows, and an **argument** -- overlapping speech with no agreed
+words -- is neither. Write that one in the segment prompt and put the sound in an AUDIO
+cue; there is nothing for H3 to quote.
+
+Attached files: `used as`, `describes` and `keep file`
+
+**used as** -- what the file is *for*. It decides the task type the summary opens with, and
+the guide wants every relationship named:
+
+
+| Used as | Task type it produces |
+| --- | --- |
+| `reference` | `reference generation` -- guidance for a character, scene, style or camera move |
+| `storyboard` | `reference generation` -- a plan of the framing, not content: *is a storyboard reference for [Shot 1], defining viewpoint, subject placement, and shot order* |
+| `first frame` / `keyframe` / `last frame` | `keyframe completion` -- the image is a concrete frame of the target video, and `retention_analysis` says which |
+| `continue from` | `video continuation` |
+| `edit` | `video editing` |
+
+
+Only `first frame` and `last frame` have an input on the model. `keyframe` is the same idea one step weaker: MiniMax's guide counts it as a frame anchor, but the core node takes exactly two stills -- `first_frame` and `last_frame` -- so a picture that should be a frame in the *middle* has nothing to be plugged into. That block's image travels with the references and the prompt asks for the placement in words -- `<Picture 1> ([Shot 2] keyframe)` where a reference would read `(appears in [Shot 2])`. An end is a guarantee, the middle is a request the model follows loosely.
+
+**A keyframe is fitted to the clip, not the other way round.** A block used as `first frame`
+or `last frame` carries a **`fit`** picker beside `keep file`. `crop`, the default, scales
+the picture and cover-crops it from the centre: proportions survive, an edge is lost.
+`stretch` hands it over untouched, which is what ComfyUI does on its own -- every pixel
+kept, the picture squashed. A picture already of the clip's shape is untouched either way;
+when the shapes disagree the report names both sizes and what it cost. To keep the whole
+picture, give the clip the picture's shape, or attach the file as a `reference` -- that
+path scales without cropping and lets the model compose the rest of the frame around it.
+
+The settings row's `default resize` sizes reference *pictures* only -- a reference video is sized
+by its own rule, a keyframe by `fit` -- so it goes dead on any clip that carries no
+reference picture: only frame anchors, only a video, only sound, or nothing at all. A picture in the Files list counts before it is placed: it reaches the model in the same reference list as one on a block. A picture answers for itself with its own `resize`, offered both on its row in Files and on a block's FILE row -- it belongs to the file, so both write the same thing. The clip's value is only for the pictures that say nothing: `max` on the face you have to keep, `match` on the mood board behind it.
+
+What it trades is detail against time. A reference picture becomes tokens the model reads beside the prompt, and those tokens are re-read at every sampling step -- more pixels, finer detail, more time. `match` shrinks it to about the clip's pixel count: fast, enough for a scene, a style, a mood. `max` allows 2048 px on the short side: slower, and what keeps a face the same face. Neither enlarges a picture or changes its proportions.
+
+**`default resize` does not touch `width` and `height`.** The clip used to take the shape of the first reference picture whenever it said `match`; now a picture block carries **set width & height** beside `detach media`, which does it on request -- for a keyframe too, which is what the crop warning asks for.
+
+An attached audio adds `audio reuse` or `audio reference` depending on its `keep`. Several
+at once combine: `[keyframe completion + video continuation + audio reuse]`.
+
+A segment holding a real file switches the prompt into H3's full-reference format -- six
+sections instead of three -- and gets its own row of fields.
+
+**describes** -- read-only, and there is no box here. What a file *is* is written once, on
+a subject card, and this line shows that card's sentence beside the `<Subject n>` it
+became with a link to the WHO & WHAT tab. Until you add one it reads `nothing describes this
+file yet`, and the linter says the same: an unnamed reference is one H3 has to guess at.
+
+Why not a box on the block? Because a file used to define something is cited *inside* that
+thing's definition rather than given a line of its own -- MiniMax's own rule -- so a second
+box here would have been a field the prompt threw away, which is exactly how it behaved.
+One file, one description.
+
+**keep file** -- how much of the file survives into the video. One per file, always; it
+also sits on the block itself, bottom right. A subject card drawn `from` this file carries
+its own `keep it` for the thing, which may differ. The sentence it produces lands in
+`retention_analysis`, as
+`<Picture 1> (appears in [Shot 2]): fully_preserved - the raccoon, ...`
+
+
+| Value | Means |
+| --- | --- |
+| `fully_preserved` | copy it -- same subject, same look, unchanged |
+| `partially_preserved` | keep the subject, let pose, angle or lighting change |
+| `attribute_transfer` | take one trait -- a face, a colour, a texture -- onto something else |
+| `weak_reference` | loose inspiration only: style, palette, grade, nothing literal |
+
+
+These are H3's own words, not ours. It reads them as instructions, so a wrong one is worse
+than a vague `describes`: `fully_preserved` on a style reference asks the model to reproduce
+the whole frame.
+
+**An audio file is graded in its own words**, because H3's format defines a different set
+for sound: `fully_copy` (reproduce this recording), `partially_copy`, `reference` (only the
+timbre or texture is followed), `weak_reference`. The picker follows the file, so there is
+nothing to get wrong.
+
+**No marker copies the file's samples into the clip.** A reference audio is encoded into
+the conditioning, and the soundtrack that comes back is the one the sampler produced and
+`VAEDecodeAudio` decoded -- `fully_copy` asks H3 to re-perform the recording, and how close
+it lands is the model's business. To ship the recording itself, wire it into `CreateVideo`
+in place of the decoded audio.
+
+**A card that reaches the prompt as nothing** is called out too: a card names a file, which
+makes it a `<Subject n>`, or describes a voice, which becomes the words in front of `(S1)`.
+With neither, the compiled prompt is byte-for-byte what it would be with no card there, and
+the row on screen says so. The reverse is called out too: a voice nobody speaks with, where
+no line names that card's `S` -- an instruction about how somebody sounds, applied to
+nothing.
+
+**Subjects live on subject cards.** Point a card's `from` at a file and it becomes a
+`<Subject n>` of its own, tracked apart from the picture it came from:
+
+`<Subject 1> is the man's face, from <Picture 2>.`
+
+That separation is what a face swap needs. The picture stays a `weak_reference` -- you do
+not want the whole frame back -- while the card's `keep it` is `attribute_transfer` onto
+the person in another shot. The shot then mentions `<Subject 1>` rather than `<Picture 2>`,
+because naming both asks for two different things at once.
+
+`onto` on the card names who receives the face, and the block carrying the picture shows
+the move as a chip. A picture whose only job is defining somebody gets no `<Picture n>`
+entry of its own: MiniMax's guide asks for it cited inside the `<Subject n>` line instead.
+An image used as a `first frame` or `keyframe` keeps its entry either way -- it is a real
+frame of the video, whoever else it defines.
+
+The block's FILE row shows that definition read-only, labelled with the `<Subject n>` it
+became and linked to the card. When the role does keep the file an entry -- a frame anchor,
+an edit source -- the card's sentence fills that in as well.
+
+Camera moves
+
+A move is three choices, the way MiniMax documents it: **motion type**, **amplitude**,
+**speed**. H3 reads prose, not enum values, so the three become one sentence.
+
+
+| Motion | Sentence sent to the model |
+| --- | --- |
+| `static` | The camera holds a static shot. |
+| `zoom_in` / `zoom_out` | The camera zooms in / out. |
+| `dolly_in` / `dolly_out` | The camera pushes in / pulls out. |
+| `pan_left` / `pan_right` | The camera pans left / right. |
+| `truck_left` / `truck_right` | The camera trucks left / right. |
+| `tilt_up` / `tilt_down` | The camera tilts up / down. |
+| `pedestal_up` / `pedestal_down` | The camera rises straight up / lowers straight down. |
+| `orbit` | The camera moves in an arc around the subject. |
+| `tracking` | The camera follows the moving subject. |
+| `pov` | The camera takes the subject's point of view. |
+| `roll_cw` / `roll_ccw` | The camera rolls clockwise / counterclockwise. |
+| `handheld` / `shake_strongly` | The camera shakes slightly / strongly. |
+
+
+A zoom and a push-in are not the same move: a zoom changes the focal length with the
+camera standing still, a push-in moves the camera body. The model knows the difference.
+
+`amplitude` (small / large) and `speed` (slow / fast) are added when set -- *The camera
+pushes in with small amplitude at slow speed.* Both default to medium and normal, which
+the guide writes by leaving them out, so those options add nothing on purpose.
+
+A note typed into a camera segment is appended after the sentence, so write it as a
+continuation rather than a sentence of its own. Camera work is its own block because a
+move can straddle a cut -- merging it into the shot line would silently pick a side.
+
+What the linter now checks
+
+`report` warns, never refuses: a description outside the **350-500 words** MiniMax asks
+for on a generation task; two adjacent shots that describe the same thing at a different
+framing (the guide asks for a camera move, not a cut); an empty AUDIO track, because
+`overall_soundscape: N/A` tells H3 the clip is **completely silent**; a voice reference
+asked to be copied; a line marked `carries over` with nothing after it; and a guessed word
+where the guide wants `[unclear]`.
+
+</details>
+
+<details>
+<summary><b>minimaxh3-i2v</b></summary>
+
+**MiniMax H3**
+
+[MiniMax H3](https://www.minimax.io/blog/minimax-h3) is MiniMax's general-purpose, omni-modal generation model. It jointly understands text, image, video, and audio, and generates video with **native stereo audio**: voice, sound effects, and music are modeled jointly in a single forward pass, not layered on afterward. Output is up to 2K resolution, 24fps, and up to about 15 seconds.
+
+About this workflow
+
+This template runs the **Image to Video** task (`MiniMaxH3ImageToVideo` node), which covers both:
+
+• **t2va** (text-to-video), when no images are connected
+• **fl2va** (first/last-frame image-to-video), when `first_frame` and/or `last_frame` are connected
+
+**Key inputs**
+
+• **first_frame / last_frame**: optional keyframes; the model generates the motion between them
+• **prompt**: describe the shots, motion, and the accompanying audio (dialogue, SFX, music) in one block
+• **width / height**: set via Resolution Selector. H3's native canvas is a 768px short edge, capped at 768x1344 pixels, rounded to a multiple of 32
+• **duration (seconds)**: converted to a valid frame `length` by the Math Expression node, snapping up to the model's 17-frame-per-block (17k+5) grid at 24fps
+
+</details>
+
+<details>
+<summary><b>minimaxh3-r2v</b></summary>
+
+**MiniMax H3**
+
+[MiniMax H3](https://www.minimax.io/blog/minimax-h3) is MiniMax's general-purpose, omni-modal generation model. It jointly understands text, image, video, and audio, and generates video with **native stereo audio**: voice, sound effects, and music are modeled jointly in a single forward pass, not layered on afterward. Output is up to 2K resolution, 24fps, and up to about 15 seconds.
+
+ComfyUI links
+• [ComfyUI#15224](https://github.com/Comfy-Org/ComfyUI/pull/15224)
+• [🤗 Comfy-Org/MiniMax-H3](https://huggingface.co/Comfy-Org/MiniMax-H3)
+
+About this workflow
+
+This template runs the **reference-to-video (ref2va)** task using the `MiniMaxH3ReferenceToVideo` node. It takes any mix of reference images, videos, and standalone audio, and weaves them into the generation to lock in a character's identity, a style, a motion, a camera move, or a voice.
+
+**Key inputs**
+
+• **ref_images / ref_videos / ref_video_audios / ref_audios**: up to 9 reference images, 3 reference videos (each may carry its own paired soundtrack), and 3 standalone reference audio clips
+• **prompt**: reference the inputs by tag, in the exact order they were connected, for example `<Picture 1>`, `<Video 1>`, `<Audio 1>`, then describe the target scene, motion, and audio
+• **ref_image_size**: `match` scales references down to the generation's resolution (faster); `max` keeps up to a 2048px short edge for stronger identity fidelity, at the cost of speed since reference tokens ride along every sampling step
+• **width / height**: set via Resolution Selector.
+• **duration (seconds)**: converted to a valid frame `length` by the Math Expression node
+
+**Sampling and decode**
+
+• Sampler: `res_multistep`. `beta` or `normal` scheduler tends to outperform `simple` for reference-heavy prompts like this one
+• The sampler's joint audio+video `LATENT` output feeds directly into both `VAEDecode` (video, `minimax_h3_video_vae_fp16`) and `VAEDecodeAudio` (audio, `minimax_h3_audio_vae_fp32`); each decode node automatically pulls its own half out of the packed latent. `CreateVideo` then muxes the two into a single MP4 with synced sound
+• The diffusion model here is `minimax_h3_ref2va_pruned_int8_convrot.safetensors`, a different set of weights from the `fl2va` model used by the t2v/i2v templates
+
+Ref2va's output is very sensitive to prompt wording; matching the reference tags precisely and being explicit about which reference drives which part of the shot tends to work best.
+
+</details>
+
+<details>
+<summary><b>minimaxh3-t2v</b></summary>
+
+**MiniMax H3**
+
+[MiniMax H3](https://www.minimax.io/blog/minimax-h3) is MiniMax's general-purpose, omni-modal generation model. It jointly understands text, image, video, and audio, and generates video with **native stereo audio**: voice, sound effects, and music are modeled jointly in a single forward pass, not layered on afterward. Output is up to 2K resolution, 24fps, and up to about 15 seconds.
+
+ComfyUI links
+• [ComfyUI#15224](https://github.com/Comfy-Org/ComfyUI/pull/15224)
+• [🤗 Comfy-Org/MiniMax-H3](https://huggingface.co/Comfy-Org/MiniMax-H3)
+
+About this workflow
+
+**Key inputs**
+
+• **prompt**: describe the shots, camera moves, and the accompanying audio (dialogue, SFX, music) in one block
+• **width / height**: set via Resolution Selector. H3's native canvas is a 768px short edge, capped at 768x1344 pixels, rounded to a multiple of 32
+• **duration (seconds)**: converted to a valid frame `length` by the Math Expression node, snapping up to the model's 17-frame-per-block (17k+5) grid at 24fps
+
+</details>
+
+**Video tutorial**
+
+MiniMax H3 bundle walkthrough:
+
+[EN](https://imbutus.com/media-videos/imbutus-media-minimaxh3/imbutus-media-minimaxh3-en.mp4) · [RU](https://imbutus.com/media-videos/imbutus-media-minimaxh3/imbutus-media-minimaxh3-ru.mp4) · [中文](https://imbutus.com/media-videos/imbutus-media-minimaxh3/imbutus-media-minimaxh3-zh.mp4)
+
+**Models in this bundle**
+
+- [MiniMax H3](https://huggingface.co/MiniMaxAI/MiniMax-H3) — Omni-modal video generation with native stereo audio — dialogue, sound effects and music come out of the same forward pass as the picture, already in sync. Takes text, images, video and audio as context; up to 15 seconds at 24fps.
+- [H3 Turbo LoRA](https://huggingface.co/lightx2v/Minimax-h3-Turbo) — Four-step distillation of MiniMax H3. The workflow's Turbo switch loads it and drops the render from 20 steps to 4, so a draft costs about a fifth of the GPU time — a preview still, weakest on audio and fast motion, so switch it off for the take you keep.
+- [H3 Latent Upscaler](https://huggingface.co/LBH-123-AI/Minimax_h3_latent_Upscaler) — Enlarges a finished clip in latent space and refines it at the new size, skipping the slow trip out through the 5B video VAE and back. The advanced workflow turns it on as a second pass, so you look at the cheap render first and only then pay for the resolution.
+
+---
+
 ##### Sulphur-2 · Bundle · Decensored
 
-Generates video clips from a text prompt, image, audio, or video with LTX Director 2.0. Sulphur-2 is an uncensored version of LTX 2.3.
+Generates video clips from a text prompt, image, audio, or video with LTX Director 2.0, plus lip-sync dubbing — feed it a finished clip and your speech and it re-generates the shot with the mouth matching your words. Sulphur-2 is an uncensored version of LTX 2.3.
 
 ComfyUI workflow: [LTXDirector](https://github.com/WhatDreamsCost/WhatDreamsCost-ComfyUI)
 
 **Ready-to-run workflows**
+
+<details>
+<summary><b>sulphur2-lipdub</b></summary>
+
+**How to use**
+
+Lip-sync an existing clip to speech you supply.
+
+1. **Load Video** (red) — upload the clip whose mouth should move.
+2. **Positive Prompt** (red) — describe the shot and write what the person says.
+3. **IC-LoRA** (orange) — `ltx-2.3-22b-ic-lora-dubit-0.9`, strength 1.0 is the tested value.
+4. Press **Run** — stage 1 generates at low resolution, stage 2 refines it.
+
+The audio comes from the loaded video. To dub a different voice, mux your voiceover onto the clip before uploading it.
+
+</details>
 
 <details>
 <summary><b>sulphur2-ltx-director-2</b></summary>
@@ -183,7 +1208,8 @@ Sulphur-2 bundle walkthrough:
 
 **Models in this bundle**
 
-- [Sulphur 2](https://huggingface.co/SulphurAI/Sulphur-2-base)
+- [Sulphur 2](https://huggingface.co/SulphurAI/Sulphur-2-base) — Generates video clips from a text prompt, image, audio, or video with LTX Director 2.0. An uncensored version of LTX 2.3.
+- [LTX DubIt IC-LoRA](https://huggingface.co/Lightricks/LTX-2.3-22b-IC-LoRA-DubIt) — Lip-sync add-on for LTX 2.3 / Sulphur-2. Re-generates a clip so the mouth matches speech you supply — dub into another language or change what the person says.
 
 ---
 
@@ -198,49 +1224,50 @@ Character animation & replacement — drive a reference character with a motion 
 
 **SCAIL-2 — Character Animation**
 
-Take the motion out of one video and put your own character into it. The driving video's background is not kept — the scene is generated fresh around your character.
+Take the motion out of one video and put your own character into it. The driving video's background is **not** kept — the scene is generated fresh around your character.
 
 **Fill these in**
 
-1. Load Video — your driving clip. Only the movement is used, never the appearance.
+**1. Load Video** — your driving clip. Only the movement is used, never the appearance.
 
-2. Load Image — the character to animate (person, mascot, drawing). One character only. The output video is sized to this image, so a portrait photo gives a portrait video.
+**2. Load Image** — the character to animate (person, mascot, drawing). One character only. The output video is sized to **this image**, so a portrait photo gives a portrait video.
 
-3. Run SAM3 Video Track — upper node, fed by Load Video. Its text box names the subject to copy motion from. One person in the clip: leave `human`. Several people: pick one, e.g. `man`, `woman in a red dress` — otherwise SCAIL-2 gets two motion tracks and one character, and the result breaks.
+**3. Run SAM3 Video Track — upper node, fed by Load Video.** Its text box names the subject to copy motion from. One person in the clip: leave `human`. Several people: pick one, e.g. `man`, `woman in a red dress` — otherwise SCAIL-2 gets two motion tracks and one character, and the result breaks.
 
-4. Run SAM3 Video Track — lower node, fed by Load Image. Leave at `human` for a person. For a non-human character use its noun, e.g. `dog`, `robot`.
+**4. Run SAM3 Video Track — lower node, fed by Load Image.** Leave at `human` for a person. For a non-human character use its noun, e.g. `dog`, `robot`.
 
-5. CLIP Text Encode (Positive Prompt) — describe your character and the action, e.g. `a short-haired man in a striped shirt, hands on his hips, full body`. Add `full body` if you want legs in frame.
+**5. CLIP Text Encode (Positive Prompt)** — describe your character and the action, e.g. `a short-haired man in a striped shirt, hands on his hips, full body`. Add `full body` if you want legs in frame.
 
-6. Press Run.
+**6. Press Run.**
 
 Check the masks first
 
-The two Preview Image nodes show the tracking masks. Exactly one subject should be coloured in each. If extra subjects light up, make the prompt in step 3 or 4 more specific, or raise detection_thres above `0.50`. Do this before any long render — a bad mask wastes the whole run.
+The two **Preview Image** nodes show the tracking masks. Exactly one subject should be coloured in each. If extra subjects light up, make the prompt in step 3 or 4 more specific, or raise **detection_thres** above `0.50`. Do this before any long render — a bad mask wastes the whole run.
 
 Length
 
-Default is 81 frames at 16 fps — about 5 seconds, taken from the start of your clip.
+Default is 81 frames at 16 fps — about 5 seconds, taken from the **start** of your clip.
 
 To go longer, raise these two together and keep them equal:
-• Load Video → frame_load_cap
-• Wan SCAIL To Video → length
+
+• **Load Video → frame_load_cap**
+• **Wan SCAIL To Video → length**
 
 `161` ≈ 10 s, `321` ≈ 20 s. SCAIL-2 is trained at 81 frames, so longer runs cost more VRAM and the character may drift.
 
-To start somewhere other than the beginning, set Load Video → skip_first_frames (in frames, at 16 fps — `160` skips 10 s).
+To start somewhere other than the beginning, set **Load Video → skip_first_frames** (in frames, at 16 fps — `160` skips 10 s).
 
 Sound
 
-This workflow does not do sound. The render is always silent — SCAIL-2 generates picture only, and nothing in the graph carries audio through to the output.
+**This workflow does not do sound.** The render is always silent — SCAIL-2 generates picture only, and nothing in the graph carries audio through to the output.
 
 Add the soundtrack afterwards in a video editor, using your original clip as the audio source. Trying to attach it here is not worth it: the render is a short slice of your clip, so the audio would not line up anyway.
 
 Video format
 
-The upload button accepts `.mp4`, `.webm`, `.mkv` and `.gif`. H.264 MP4 is the safe choice.
+The upload button accepts `.mp4`, `.webm`, `.mkv` and `.gif`. **H.264 MP4** is the safe choice.
 
-If a clip is rejected with "Invalid video file", re-encode it before uploading. A common cause is a movie-rip audio track (AC-3) that the pod's ffmpeg cannot decode:
+If a clip is rejected with **"Invalid video file"**, re-encode it before uploading. A common cause is a movie-rip audio track (AC-3) that the pod's ffmpeg cannot decode:
 
 ```
 ffmpeg -i input.mp4 -c:v libx264 -pix_fmt yuv420p -an clean.mp4
@@ -249,9 +1276,10 @@ ffmpeg -i input.mp4 -c:v libx264 -pix_fmt yuv420p -an clean.mp4
 `-an` drops the audio, which this workflow does not use anyway. Keep the clip's own resolution — it is resized internally, so a huge 4K source only costs upload time.
 
 Leave alone unless you know why
-• Negative Prompt — a fixed quality filter, not something to describe your video with.
-• KSampler — `steps 6`, `cfg 1.0`, `euler` / `simple`. These are tuned for the distilled LoRA; raising steps or cfg makes it worse, not better.
-• Create SCAIL-2 Colored Mask → replacement_mode — `false` here on purpose. Setting it `true` switches to the replacement behaviour (keeps the original background), which is what the scail2-replacement workflow already does.
+
+• **Negative Prompt** — a fixed quality filter, not something to describe your video with.
+• **KSampler** — `steps 6`, `cfg 1.0`, `euler` / `simple`. These are tuned for the distilled LoRA; raising steps or cfg makes it worse, not better.
+• **Create SCAIL-2 Colored Mask → replacement_mode** — `false` here on purpose. Setting it `true` switches to the replacement behaviour (keeps the original background), which is what the **scail2-replacement** workflow already does.
 • Every model this workflow needs is already installed on the pod.
 
 </details>
@@ -261,59 +1289,60 @@ Leave alone unless you know why
 
 **SCAIL-2 — Character Animation (two characters)**
 
-Same graph as the single-character animation, driven by a clip with two moving subjects. Only the inputs and the prompts differ.
+Same graph as the single-character animation, driven by a clip with **two** moving subjects. Only the inputs and the prompts differ.
 
 There is only ONE Load Image — and that is correct
 
-There is no second image node, and you should not add one. Both characters come from a single reference image that already contains both of them. SAM3 finds both figures inside that one picture and hands SCAIL-2 two separate coloured regions.
+There is no second image node, and you should not add one. Both characters come from a **single reference image that already contains both of them**. SAM3 finds both figures inside that one picture and hands SCAIL-2 two separate coloured regions.
 
-It has to be one real photograph of both subjects together — one background, one camera, one light. The output video is built from this frame, so whatever you hand over becomes the scene.
+It has to be **one real photograph of both subjects together** — one background, one camera, one light. The output video is built from this frame, so whatever you hand over becomes the scene.
 
-Do not glue two separate photos side by side. A collage keeps both backgrounds and the seam between them, and the render comes out looking like two videos in one frame. If all you have is a separate photo of each character, this workflow cannot merge them — run the single-character scail2-animation workflow on each one instead.
+**Do not glue two separate photos side by side.** A collage keeps both backgrounds and the seam between them, and the render comes out looking like two videos in one frame. If all you have is a separate photo of each character, this workflow cannot merge them — run the single-character **scail2-animation** workflow on each one instead.
 
 **Fill these in**
 
-1. Load Image — one picture holding both characters. The output video is sized to this image, so a wide image gives a wide video. Both characters should be clearly separated and, if you want limbs animated, fully in frame.
+**1. Load Image** — one picture holding **both** characters. The output video is sized to this image, so a wide image gives a wide video. Both characters should be clearly separated and, if you want limbs animated, fully in frame.
 
-2. Load Video — a driving clip with two moving subjects. Their motion is copied; their appearance is not.
+**2. Load Video** — a driving clip with **two** moving subjects. Their motion is copied; their appearance is not.
 
-3. Run SAM3 Video Track — upper node, fed by Load Video. Leave at `human` when the clip has exactly two people and you want both. Use a narrower word only if there are extra people to exclude.
+**3. Run SAM3 Video Track — upper node, fed by Load Video.** Leave at `human` when the clip has exactly two people and you want both. Use a narrower word only if there are extra people to exclude.
 
-4. Run SAM3 Video Track — lower node, fed by Load Image. Leave at `human` for two people. For non-human characters use a word that matches both, e.g. `mascot` or `character` — a word matching only one of them will leave the other untracked.
+**4. Run SAM3 Video Track — lower node, fed by Load Image.** Leave at `human` for two people. For non-human characters use a word that matches **both**, e.g. `mascot` or `character` — a word matching only one of them will leave the other untracked.
 
-5. CLIP Text Encode (Positive Prompt) — describe both characters and what they do together, e.g. `a black dog mascot character and a green-and-cream bird mascot character holding hands and dancing on a white stage`.
+**5. CLIP Text Encode (Positive Prompt)** — describe **both** characters and what they do together, e.g. `a black dog mascot character and a green-and-cream bird mascot character holding hands and dancing on a white stage`.
 
-6. Press Run.
+**6. Press Run.**
 
 Check the masks first — this matters most here
 
-The two Preview Image nodes show the tracking masks. You need two differently coloured regions in each: two in the driving mask, two in the reference mask. If either shows one region, or three, fix the prompt in step 3 or 4 before rendering.
+The two **Preview Image** nodes show the tracking masks. You need **two** differently coloured regions in each: two in the driving mask, two in the reference mask. If either shows one region, or three, fix the prompt in step 3 or 4 before rendering.
 
-Who maps to whom is decided by Create SCAIL-2 Colored Mask → sort_by (`area` by default — biggest region first in both masks). If the wrong character gets the wrong motion, that pairing is the reason.
+Who maps to whom is decided by **Create SCAIL-2 Colored Mask → sort_by** (`area` by default — biggest region first in both masks). If the wrong character gets the wrong motion, that pairing is the reason.
 
 Length
 
-Default is 81 frames at 16 fps — about 5 seconds, from the start of the clip.
+Default is 81 frames at 16 fps — about 5 seconds, from the **start** of the clip.
 
 To go longer, raise these together and keep them equal:
-• Load Video → frame_load_cap
-• Wan SCAIL To Video → length
+
+• **Load Video → frame_load_cap**
+• **Wan SCAIL To Video → length**
 
 `161` ≈ 10 s, `321` ≈ 20 s. SCAIL-2 is trained at 81 frames — longer runs cost more VRAM and drift more, and two characters drift faster than one.
 
-To start later in the clip, use Load Video → skip_first_frames (frames at 16 fps — `160` skips 10 s).
+To start later in the clip, use **Load Video → skip_first_frames** (frames at 16 fps — `160` skips 10 s).
 
 Sound
 
-This workflow does not do sound. The render is always silent — SCAIL-2 generates picture only, and nothing in the graph carries audio through to the output.
+**This workflow does not do sound.** The render is always silent — SCAIL-2 generates picture only, and nothing in the graph carries audio through to the output.
 
 Add the soundtrack afterwards in a video editor, using your original clip as the audio source. Trying to attach it here is not worth it: the render is a short slice of your clip, so the audio would not line up anyway.
 
 Video format
 
-The upload button accepts `.mp4`, `.webm`, `.mkv` and `.gif`. H.264 MP4 is the safe choice.
+The upload button accepts `.mp4`, `.webm`, `.mkv` and `.gif`. **H.264 MP4** is the safe choice.
 
-If a clip is rejected with "Invalid video file", re-encode it before uploading. A common cause is a movie-rip audio track (AC-3) that the pod's ffmpeg cannot decode:
+If a clip is rejected with **"Invalid video file"**, re-encode it before uploading. A common cause is a movie-rip audio track (AC-3) that the pod's ffmpeg cannot decode:
 
 ```
 ffmpeg -i input.mp4 -c:v libx264 -pix_fmt yuv420p -an clean.mp4
@@ -322,9 +1351,10 @@ ffmpeg -i input.mp4 -c:v libx264 -pix_fmt yuv420p -an clean.mp4
 `-an` drops the audio, which this workflow does not use anyway. Keep the clip's own resolution — it is resized internally, so a huge 4K source only costs upload time.
 
 Leave alone unless you know why
-• Negative Prompt — a fixed quality filter, not a place to describe your video.
-• KSampler — `steps 6`, `cfg 1.0`, `euler` / `simple`, tuned for the distilled LoRA. Raising steps or cfg makes it worse.
-• replacement_mode — `false` here on purpose; the background is meant to be generated fresh. To keep an original background instead, use the scail2-replacement workflow.
+
+• **Negative Prompt** — a fixed quality filter, not a place to describe your video.
+• **KSampler** — `steps 6`, `cfg 1.0`, `euler` / `simple`, tuned for the distilled LoRA. Raising steps or cfg makes it worse.
+• **replacement_mode** — `false` here on purpose; the background is meant to be generated fresh. To keep an original background instead, use the **scail2-replacement** workflow.
 • Every model this workflow needs is already installed on the pod.
 
 </details>
@@ -338,40 +1368,41 @@ Swap one person in your video for your own character. The original scene, backgr
 
 **Steps**
 
-1. Load Video — upload your clip. The output is sized to this video, not to your image.
-2. Load Image — upload the character who takes their place. A clear, full-body photo works best.
-3. Run SAM3 Video Track (the upper one, fed by Load Video) — its text box says who gets replaced. One person in the clip: leave `human`. Several people: name the one you want, e.g. `man` or `woman in a red dress`.
-4. Run SAM3 Video Track (the lower one, fed by Load Image) — leave it at `human`.
-5. Positive Prompt — describe your new character inside the video's setting, e.g. `bearded man in a grey suit sitting at the desk`.
-6. Press Run.
+1. **Load Video** — upload your clip. The output is sized to this video, not to your image.
+2. **Load Image** — upload the character who takes their place. A clear, full-body photo works best.
+3. **Run SAM3 Video Track** (the upper one, fed by Load Video) — its text box says who gets replaced. One person in the clip: leave `human`. Several people: name the one you want, e.g. `man` or `woman in a red dress`.
+4. **Run SAM3 Video Track** (the lower one, fed by Load Image) — leave it at `human`.
+5. **Positive Prompt** — describe your new character inside the video's setting, e.g. `bearded man in a grey suit sitting at the desk`.
+6. Press **Run**.
 
 Check the masks before a long render
 
-The two Preview Image nodes show the tracking masks. In the driving mask, only the person being replaced should be coloured. If extra people light up, make the prompt in step 3 more specific, or raise detection_thres above 0.50.
+The two **Preview Image** nodes show the tracking masks. In the driving mask, only the person being replaced should be coloured. If extra people light up, make the prompt in step 3 more specific, or raise **detection_thres** above 0.50.
 
 Length
 
-A default run is 81 frames at 16 fps — about 5 seconds, taken from the start of your clip.
+A default run is 81 frames at 16 fps — about 5 seconds, taken from the **start** of your clip.
 
 For longer output raise these two together and keep them equal:
-• Load Video → frame_load_cap
-• Wan SCAIL To Video → length
+
+• **Load Video → frame_load_cap**
+• **Wan SCAIL To Video → length**
 
 `161` ≈ 10 seconds, `321` ≈ 20 seconds. SCAIL-2 is trained at 81 frames, so longer runs cost more VRAM and the character may drift.
 
-To start later in the clip, set Load Video → skip_first_frames (frames at 16 fps — `160` skips 10 s). Running the same clip in 81-frame slices at `0`, `81`, `162`, `243` and joining the files is the alternative to one long render; expect a visible seam at each join.
+To start later in the clip, set **Load Video → skip_first_frames** (frames at 16 fps — `160` skips 10 s). Running the same clip in 81-frame slices at `0`, `81`, `162`, `243` and joining the files is the alternative to one long render; expect a visible seam at each join.
 
 Sound
 
-This workflow does not do sound. The render is always silent — SCAIL-2 generates picture only, and nothing in the graph carries audio through to the output.
+**This workflow does not do sound.** The render is always silent — SCAIL-2 generates picture only, and nothing in the graph carries audio through to the output.
 
 Add the soundtrack afterwards in a video editor, using your original clip as the audio source. Trying to attach it here is not worth it: the render is a short slice of your clip, so the audio would not line up anyway.
 
 Video format
 
-The upload button accepts `.mp4`, `.webm`, `.mkv` and `.gif`. H.264 MP4 is the safe choice.
+The upload button accepts `.mp4`, `.webm`, `.mkv` and `.gif`. **H.264 MP4** is the safe choice.
 
-If a clip is rejected with "Invalid video file", re-encode it before uploading. A common cause is a movie-rip audio track (AC-3) that the pod's ffmpeg cannot decode:
+If a clip is rejected with **"Invalid video file"**, re-encode it before uploading. A common cause is a movie-rip audio track (AC-3) that the pod's ffmpeg cannot decode:
 
 ```
 ffmpeg -i input.mp4 -c:v libx264 -pix_fmt yuv420p -an clean.mp4
@@ -380,10 +1411,11 @@ ffmpeg -i input.mp4 -c:v libx264 -pix_fmt yuv420p -an clean.mp4
 `-an` drops the audio. Since this workflow keeps the original scene, re-encode from the highest-quality source you have — the output resolution is taken from this clip.
 
 Leave alone unless you know why
-• Replace mode is already on — the toggles on Create SCAIL-2 Colored Mask and Wan SCAIL To Video are `true`. Turning them off gives the animation behaviour instead (original background discarded).
-• Negative Prompt — a fixed quality filter, not a place to describe your video.
-• KSampler — `steps 6`, `cfg 1.0`, `euler` / `simple`, tuned for the distilled LoRA. Raising steps or cfg makes results worse, not better.
-• Output size comes from the video via Get Image from Batch, not from your reference image — so a portrait clip stays portrait no matter what you upload.
+
+• **Replace mode is already on** — the toggles on **Create SCAIL-2 Colored Mask** and **Wan SCAIL To Video** are `true`. Turning them off gives the animation behaviour instead (original background discarded).
+• **Negative Prompt** — a fixed quality filter, not a place to describe your video.
+• **KSampler** — `steps 6`, `cfg 1.0`, `euler` / `simple`, tuned for the distilled LoRA. Raising steps or cfg makes results worse, not better.
+• **Output size** comes from the video via **Get Image from Batch**, not from your reference image — so a portrait clip stays portrait no matter what you upload.
 • Every model this workflow needs is already installed on the pod.
 
 </details>
@@ -407,13 +1439,13 @@ FLUX.2 klein 9B (uncensored) — fast text → image + multi-reference editing, 
 
 **ControlNet (depth) — klein**
 
-1. Load Image depth (red) — drop the photo whose structure you want to copy. A depth map is auto-extracted (Depth Anything V2).
-2. Load Image reference (red) — drop the subject/style reference to place into that structure.
-3. Prompt — describe the result (default `refcontrol`).
-4. RefControl strength (yellow) — the `Lora` node. Higher = follow the depth structure more strictly.
-5. Press Run — result in Save Image.
+1. **Load Image depth** (red) — drop the photo whose **structure** you want to copy. A depth map is auto-extracted (Depth Anything V2).
+2. **Load Image reference** (red) — drop the **subject/style** reference to place into that structure.
+3. **Prompt** — describe the result (default `refcontrol`).
+4. **RefControl strength** (yellow) — the `Lora` node. Higher = follow the depth structure more strictly.
+5. Press **Run** — result in **Save Image**.
 
-Powered by the RefControl depth LoRA for klein 9B. The first depth run downloads the preprocessor weights (~1.3GB) once.
+Powered by the **RefControl depth LoRA** for klein 9B. The first depth run downloads the preprocessor weights (~1.3GB) once.
 
 </details>
 
@@ -422,12 +1454,12 @@ Powered by the RefControl depth LoRA for klein 9B. The first depth run downloads
 
 **Face Swap — DarkBeast (klein 9B)**
 
-1. Target photo (red, top-left) — the picture whose face gets replaced. Ships with `example.png` so the graph runs out of the box.
-2. Face to swap in (red, bottom-left) — the source face/identity to paste on.
-3. Prompt — inside the Face Swap node; keep it simple, e.g. *swap the face of the person with the reference face, keep pose, expression and lighting*.
-4. Steps = 5, CFG = 1 — DarkBeast is a distilled BFS model tuned for 5 steps / CFG 1. Do not raise them — higher values make it worse, not better.
-5. Color Match (orange) regrades the result to the target's lighting so the swap blends in. Lower `strength` (or 0) to disable.
-6. Press Run — the result is saved in Save Image.
+1. **Target photo** (red, top-left) — the picture whose face gets replaced. Ships with `example.png` so the graph runs out of the box.
+2. **Face to swap in** (red, bottom-left) — the source face/identity to paste on.
+3. **Prompt** — inside the **Face Swap** node; keep it simple, e.g. *swap the face of the person with the reference face, keep pose, expression and lighting*.
+4. **Steps = 5, CFG = 1** — DarkBeast is a distilled BFS model tuned for 5 steps / CFG 1. **Do not raise them** — higher values make it worse, not better.
+5. **Color Match** (orange) regrades the result to the target's lighting so the swap blends in. Lower `strength` (or 0) to disable.
+6. Press **Run** — the result is saved in **Save Image**.
 
 DarkBeast Klein 9b V2 BFS — face-swap-specialized klein 9B (safetensors, loaded via UNETLoader).
 
@@ -438,11 +1470,11 @@ DarkBeast Klein 9b V2 BFS — face-swap-specialized klein 9B (safetensors, loade
 
 **Image Edit — klein (multi-reference)**
 
-1. Load Image (red, group *image 1*) — drop the reference picture. It ships with `example.png` so the graph runs out of the box.
-2. Prompt — describe the edit inside the Image Edit node.
-3. Reference images toggle — switch *image 2* … *image 10* on to use more reference pictures. Each toggle enables one Load Image group on the left.
-4. Color Match (orange) — regrades the result to image 1's lighting/colors so edits blend in. Lower `strength` (or 0) to disable.
-5. Press Run — the result is saved in Save Image.
+1. **Load Image** (red, group *image 1*) — drop the reference picture. It ships with `example.png` so the graph runs out of the box.
+2. **Prompt** — describe the edit inside the **Image Edit** node.
+3. **Reference images** toggle — switch *image 2* … *image 10* on to use more reference pictures. Each toggle enables one Load Image group on the left.
+4. **Color Match** (orange) — regrades the result to image 1's lighting/colors so edits blend in. Lower `strength` (or 0) to disable.
+5. Press **Run** — the result is saved in **Save Image**.
 
 FLUX.2 klein 9B (uncensored) — fast text → image + up to 10 reference images.
 
@@ -453,9 +1485,9 @@ FLUX.2 klein 9B (uncensored) — fast text → image + up to 10 reference images
 
 **How to use**
 
-1. Prompt (orange) — type what you want to generate.
-2. Two variants: Standard and Distilled (faster). Enable one and bypass the other with Ctrl-B.
-3. Press Run — the result is saved in Save Image.
+1. **Prompt** (orange) — type what you want to generate.
+2. Two variants: **Standard** and **Distilled (faster)**. Enable one and bypass the other with **Ctrl-B**.
+3. Press **Run** — the result is saved in **Save Image**.
 
 FLUX.2 klein 9B (uncensored) — fast text → image.
 
@@ -469,8 +1501,8 @@ FLUX.2 klein bundle walkthrough:
 
 **Models in this bundle**
 
-- [FLUX.2 klein 9B (True V3, uncensored)](https://huggingface.co/wikeeyang/Flux2-Klein-9B-True-V3)Fast 9B FLUX.2 klein, uncensored — the "True V3" aesthetic fine-tune with an abliterated text encoder. Text-to-image, multi-reference editing, and RefControl depth/structure control, light enough for a single 24GB GPU.
-- [DarkBeast Klein 9b V2 BFS (face-swap, uncensored)](https://huggingface.co/wraps/FLUX.2-klein-9B-Blitz-ComfyUI)DarkBeast Klein 9b V2 BFS — a face-swap-specialized fine-tune of FLUX.2 klein 9B, uncensored. Distilled for 5 steps at CFG 1 (Best Face Swap tech): give it a target photo and a reference face and it pastes the identity in while keeping pose, expression and lighting. Ships alongside the True V3 tune — just pick it in the loader. fp8 on a 24GB card, bf16 on 32GB.
+- [FLUX.2 klein 9B (True V3, uncensored)](https://huggingface.co/wikeeyang/Flux2-Klein-9B-True-V3) — Fast 9B FLUX.2 klein, uncensored — the "True V3" aesthetic fine-tune with an abliterated text encoder. Text-to-image, multi-reference editing, and RefControl depth/structure control, light enough for a single 24GB GPU.
+- [DarkBeast Klein 9b V2 BFS (face-swap, uncensored)](https://huggingface.co/wraps/FLUX.2-klein-9B-Blitz-ComfyUI) — DarkBeast Klein 9b V2 BFS — a face-swap-specialized fine-tune of FLUX.2 klein 9B, uncensored. Distilled for 5 steps at CFG 1 (Best Face Swap tech): give it a target photo and a reference face and it pastes the identity in while keeping pose, expression and lighting. Ships alongside the True V3 tune — just pick it in the loader. fp8 on a 24GB card, bf16 on 32GB.
 
 ---
 
@@ -487,9 +1519,9 @@ The abliterated encoder removes prompt refusals, but NSFW was filtered from the 
 
 **How to use**
 
-1. Prompt Builder (red) — type your prompt in the Description field (plain language is fine). For layout control, open the Ideogram 4 editor and drag boxes to place objects/text in regions.
-2. Resolution Selector (orange) — choose aspect ratio / size.
-3. Press Run — the image appears in Save Image.
+1. **Prompt Builder** (red) — type your prompt in the **Description** field (plain language is fine). For layout control, open the **Ideogram 4 editor** and drag boxes to place objects/text in regions.
+2. **Resolution Selector** (orange) — choose aspect ratio / size.
+3. Press **Run** — the image appears in **Save Image**.
 
 *"Image blocked by safety filter" comes from the model's own safety training, not ComfyUI.*
 
@@ -512,9 +1544,9 @@ Contains two models: Qwen-Image-2512 generates images from text, and Qwen-Image-
 
 **How to use**
 
-1. Load Image — upload image 1 (required). Type the edit instruction in the Image Edit prompt field.
-2. To combine pictures, enable Load Image 2 / 3 (right-click → Set Mode → Always) and upload.
-3. Press Run — result in Save Image.
+1. **Load Image** — upload **image 1** (required). Type the edit instruction in the **Image Edit** prompt field.
+2. To combine pictures, **enable Load Image 2 / 3** (right-click → Set Mode → Always) and upload.
+3. Press **Run** — result in **Save Image**.
 
 Predefined example — reset every GPU start; use Workflows → Save As to keep your own copy.
 
@@ -525,9 +1557,9 @@ Predefined example — reset every GPU start; use Workflows → Save As to keep 
 
 **How to use**
 
-1. Load Image (red) — drop the photo whose camera angle you want to change.
-2. Qwen Multiangle Camera (red) — drag the 3D handle to set the angle, or pick a preset. The prompt is built for you.
-3. Press Run — the re-angled image appears in Save Image.
+1. **Load Image** (red) — drop the photo whose camera angle you want to change.
+2. **Qwen Multiangle Camera** (red) — drag the 3D handle to set the angle, or pick a preset. The prompt is built for you.
+3. Press **Run** — the re-angled image appears in **Save Image**.
 
 Powered by Qwen-Image-Edit-2511 + the multi-angle camera LoRA (4-step Lightning).
 
@@ -545,12 +1577,12 @@ The quality of the style transfer depends largely on the quality of the RF inver
 
 **How to use**
 
-1. Text to Image (red) — type your prompt in the text field, set width / height (and seed if you want).
-2. Press Run — the image appears in Save Image.
+1. **Text to Image** (red) — type your prompt in the **text** field, set **width / height** (and **seed** if you want).
+2. Press **Run** — the image appears in **Save Image**.
 
-Sizes: 1:1 1328×1328 · 16:9 1664×928 · 9:16 928×1664 · 4:3 1472×1104 · 3:4 1104×1472
+**Sizes:** 1:1 1328×1328 · 16:9 1664×928 · 9:16 928×1664 · 4:3 1472×1104 · 3:4 1104×1472
 
-Predefined example — reset on every GPU start. Use Workflows → Save As to keep your own copy.
+Predefined example — reset on every GPU start. Use **Workflows → Save As** to keep your own copy.
 
 </details>
 
@@ -559,10 +1591,10 @@ Predefined example — reset on every GPU start. Use Workflows → Save As to ke
 
 **Upscale to 4K**
 
-1. Load Image (red) — drop any image (e.g. one you made with the Text-to-Image workflow).
-2. Target size (yellow) — `Scale to Total Pixels` sets the working resolution. `4` MP ≈ 4K; raise/lower for your GPU.
-3. Refine (yellow) — the `KSampler` re-renders detail at the new size. `denoise` ~0.35–0.45: higher = more new detail, lower = closer to the original.
-4. Press Run — the upscaled image lands in Save Image.
+1. **Load Image** (red) — drop any image (e.g. one you made with the Text-to-Image workflow).
+2. **Target size** (yellow) — `Scale to Total Pixels` sets the working resolution. `4` MP ≈ 4K; raise/lower for your GPU.
+3. **Refine** (yellow) — the `KSampler` re-renders detail at the new size. `denoise` ~**0.35–0.45**: higher = more new detail, lower = closer to the original.
+4. Press **Run** — the upscaled image lands in **Save Image**.
 
 This is a single refine pass on an existing image. Generate first in the Text-to-Image workflow, then upscale here.
 
@@ -570,8 +1602,8 @@ This is a single refine pass on an existing image. Generate first in the Text-to
 
 **Models in this bundle**
 
-- [Qwen-Image-2512](https://huggingface.co/Qwen/Qwen-Image-2512)Generates images from text with high prompt fidelity and strong text-in-image rendering.
-- [Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511)Edits existing images by prompt — background swaps, object add/remove, restyling (up to 3 input images).
+- [Qwen-Image-2512](https://huggingface.co/Qwen/Qwen-Image-2512) — Generates images from text with high prompt fidelity and strong text-in-image rendering.
+- [Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511) — Edits existing images by prompt — background swaps, object add/remove, restyling (up to 3 input images).
 
 ---
 
@@ -588,10 +1620,10 @@ The abliterated encoder removes prompt refusals, but the model has soft safety a
 
 **How to use**
 
-1. Load Image (red) — upload the image you want to edit.
-2. Instruction — double-click the red Image Edit (Boogu) subgraph and type what to change in the prompt box.
-3. Size (yellow) — output matches the input by default. Bypass Resize Image/Mask to keep the original size, or raise its megapixels (e.g. `4`) for higher resolution — depends on your GPU.
-4. Press Run — compare input vs result in Image Compare; the result is saved in Save Image.
+1. **Load Image** (red) — upload the image you want to edit.
+2. **Instruction** — double-click the red **Image Edit (Boogu)** subgraph and type what to change in the prompt box.
+3. **Size** (yellow) — output matches the input by default. Bypass **Resize Image/Mask** to keep the original size, or raise its **megapixels** (e.g. `4`) for higher resolution — depends on your GPU.
+4. Press **Run** — compare input vs result in **Image Compare**; the result is saved in **Save Image**.
 
 Boogu Edit is instruction-based image editing with strong bilingual (English / 中文) text rendering.
 
@@ -602,18 +1634,18 @@ Boogu Edit is instruction-based image editing with strong bilingual (English / �
 
 **How to use**
 
-1. Prompt — double-click the red Text to Image (Boogu Turbo) subgraph and type your description in the prompt box.
-2. Resolution (yellow) — pick aspect ratio / size in Resolution Selector.
-3. Press Run — the image appears in Save Image.
+1. **Prompt** — double-click the red **Text to Image (Boogu Turbo)** subgraph and type your description in the prompt box.
+2. **Resolution** (yellow) — pick aspect ratio / size in **Resolution Selector**.
+3. Press **Run** — the image appears in **Save Image**.
 
-Boogu Turbo is a fast text-to-image model with strong bilingual (English / 中文) text rendering. For instruction-based image editing, open the Boogu Edit workflow.
+Boogu Turbo is a fast text-to-image model with strong bilingual (English / 中文) text rendering. For instruction-based image editing, open the **Boogu Edit** workflow.
 
 </details>
 
 **Models in this bundle**
 
-- [Boogu-Image Turbo](https://huggingface.co/Boogu/Boogu-Image-0.1-Turbo)Fast 4-step text-to-image with strong photorealism and bilingual (English/Chinese) text rendering.
-- [Boogu-Image Edit](https://huggingface.co/Boogu/Boogu-Image-0.1-Edit)Instruction-based image editing — describe the change in text to insert, replace, or restyle objects in an image.
+- [Boogu-Image Turbo](https://huggingface.co/Boogu/Boogu-Image-0.1-Turbo) — Fast 4-step text-to-image with strong photorealism and bilingual (English/Chinese) text rendering.
+- [Boogu-Image Edit](https://huggingface.co/Boogu/Boogu-Image-0.1-Edit) — Instruction-based image editing — describe the change in text to insert, replace, or restyle objects in an image.
 
 ---
 
@@ -628,16 +1660,17 @@ Fast, photorealistic text-to-image at up to 2K resolution, with 9 selectable sty
 
 **How to use**
 
-1. Prompt — double-click the red Text to Image (Krea-2 Turbo) subgraph and type your description in Text String (User Prompt).
-2. Resolution (orange) — pick aspect ratio / size in Resolution Selector.
-3. Press Run — the image appears in Save Image.
+1. **Prompt** — double-click the red **Text to Image (Krea-2 Turbo)** subgraph and type your description in **Text String (User Prompt)**.
+2. **Resolution** (orange) — pick aspect ratio / size in **Resolution Selector**.
+3. Press **Run** — the image appears in **Save Image**.
 
-Prompt enhancement is on by default; it expands your prompt using the model's own text encoder (no extra model needed). Toggle `prompt_enhance` inside the subgraph to turn it off.
+**Prompt enhancement** is on by default; it expands your prompt using the model's own text encoder (no extra model needed). Toggle `prompt_enhance` inside the subgraph to turn it off.
 
-Style LoRAs — set `enable_lora?` to true inside the subgraph, pick a `krea2_*` file in LoraLoaderModelOnly; the matching trigger word is added automatically. All 9 LoRAs are pre-installed.
+**Style LoRAs** — set `enable_lora?` to true inside the subgraph, pick a `krea2_*` file in **LoraLoaderModelOnly**; the matching trigger word is added automatically. All 9 LoRAs are pre-installed.
+
 
 | LoRA | Trigger Word | Strength |
-|---|---|---|
+| --- | --- | --- |
 | `krea2_darkbrush` | `monochrome ink wash style` | `1.0` |
 | `krea2_dotmatrix` | `monochrome stippling style` | `1.0` |
 | `krea2_kidsdrawing` | `naive expressive sketch style` | `1.0` |
@@ -647,6 +1680,8 @@ Style LoRAs — set `enable_lora?` to true inside the subgraph, pick a `krea2_*`
 | `krea2_softwatercolor` | `art deco watercolor style` | `1.0` |
 | `krea2_sunsetblur` | `ethereal motion blur style` | `1.0` |
 | `krea2_vintagetarot` | `vintage tarot style` | `1.0` |
+
+
 
 </details>
 
@@ -658,7 +1693,7 @@ Style LoRAs — set `enable_lora?` to true inside the subgraph, pick a `krea2_*`
 
 **Shared models**
 
-- [WhisperX](https://github.com/m-bain/whisperX)Speech-to-text engine for voice-to-SRT (default). Whisper core plus phoneme forced-alignment for very tight word-level subtitle timing, plus speaker diarization.Used in: Fish Audio S2 · CosyVoice 3 · Qwen3-TTS · Chatterbox Multilingual
+- [WhisperX](https://github.com/m-bain/whisperX) — Speech-to-text engine for voice-to-SRT (default). Whisper core plus phoneme forced-alignment for very tight word-level subtitle timing, plus speaker diarization.Used in: Fish Audio S2 · CosyVoice 3 · Qwen3-TTS · Chatterbox Multilingual
 
 ---
 
@@ -673,10 +1708,10 @@ The dubbing pick — text-to-speech and voice cloning across 80+ languages (Fish
 
 **Script → per-section SRT**
 
-1. Load audio (red, left) — upload the recording of your narration.
-2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
-3. language — leave `auto`, or set `ru` / `en` / `zh`.
-4. Press Run — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A ⬇ Download SRT button appears when it finishes.
+1. **Load audio** (red, left) — upload the recording of your narration.
+2. **script** (in the Align node) — paste your script; a **blank line** starts a new section. Each section becomes **one SRT cue**.
+3. **language** — leave `auto`, or set `ru` / `en` / `zh`.
+4. Press **Run** — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A **⬇ Download SRT** button appears when it finishes.
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
@@ -745,10 +1780,10 @@ The change-voice pick — native voice conversion keeps the original words, paus
 
 **Script → per-section SRT**
 
-1. Load audio (red, left) — upload the recording of your narration.
-2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
-3. language — leave `auto`, or set `ru` / `en` / `zh`.
-4. Press Run — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A ⬇ Download SRT button appears when it finishes.
+1. **Load audio** (red, left) — upload the recording of your narration.
+2. **script** (in the Align node) — paste your script; a **blank line** starts a new section. Each section becomes **one SRT cue**.
+3. **language** — leave `auto`, or set `ru` / `en` / `zh`.
+4. Press **Run** — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A **⬇ Download SRT** button appears when it finishes.
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
@@ -840,10 +1875,10 @@ The all-Qwen bundle — text-to-speech with 3-second voice cloning plus voice de
 
 **Script → per-section SRT**
 
-1. Load audio (red, left) — upload the recording of your narration.
-2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
-3. language — leave `auto`, or set `ru` / `en` / `zh`.
-4. Press Run — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A ⬇ Download SRT button appears when it finishes.
+1. **Load audio** (red, left) — upload the recording of your narration.
+2. **script** (in the Align node) — paste your script; a **blank line** starts a new section. Each section becomes **one SRT cue**.
+3. **language** — leave `auto`, or set `ru` / `en` / `zh`.
+4. Press **Run** — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A **⬇ Download SRT** button appears when it finishes.
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
@@ -928,9 +1963,9 @@ Tip: to REUSE a designed voice, save its output and feed it into the Voice Clone
 
 **Models in this bundle**
 
-- [Qwen3-TTS-1.7B-VoiceDesign](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign)Voice design model — describe the voice you want in plain words (gender, age, mood, accent) and it speaks your text with that voice. 10 languages.
-- [Qwen3-TTS-1.7B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base)Voice cloning model — a 3-second reference sample defines the output voice. 10 languages.
-- [Qwen3-ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B)Alternative speech-to-text engine for voice-to-SRT, shipped only in the Qwen3-TTS bundle. Built-in word-level timestamps.
+- [Qwen3-TTS-1.7B-VoiceDesign](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign) — Voice design model — describe the voice you want in plain words (gender, age, mood, accent) and it speaks your text with that voice. 10 languages.
+- [Qwen3-TTS-1.7B-Base](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base) — Voice cloning model — a 3-second reference sample defines the output voice. 10 languages.
+- [Qwen3-ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) — Alternative speech-to-text engine for voice-to-SRT, shipped only in the Qwen3-TTS bundle. Built-in word-level timestamps.
 
 ---
 
@@ -945,10 +1980,10 @@ Text-to-speech, voice cloning and native voice conversion in 23 languages (Chatt
 
 **Script → per-section SRT**
 
-1. Load audio (red, left) — upload the recording of your narration.
-2. script (in the Align node) — paste your script; a blank line starts a new section. Each section becomes one SRT cue.
-3. language — leave `auto`, or set `ru` / `en` / `zh`.
-4. Press Run — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A ⬇ Download SRT button appears when it finishes.
+1. **Load audio** (red, left) — upload the recording of your narration.
+2. **script** (in the Align node) — paste your script; a **blank line** starts a new section. Each section becomes **one SRT cue**.
+3. **language** — leave `auto`, or set `ru` / `en` / `zh`.
+4. Press **Run** — WhisperX aligns your exact text to the speech and writes an SRT with one cue per section (exact start/end). A **⬇ Download SRT** button appears when it finishes.
 
 Sections whose words aren't found in the audio (e.g. a line you skipped while reading) are dropped and logged. Runs best on a GPU tier.
 
@@ -1022,8 +2057,8 @@ First run loads the model (pre-baked at boot, a few seconds).
 
 Each bundle opens in ComfyUI with working workflows you can run as they are — open the Workflows panel and look in the "_examples" folder. Every workflow carries a "How to use" note on the canvas telling you which fields to fill in and in what order, so nothing has to be memorised. Generated results show up in the Assets tab. A workflow is a graph of nodes — you only need to touch the ones that ask for your input. Nodes are color-coded:
 
-- Required — you must provide this before running — upload a file or type a prompt.
-- Crucial — important to check or commonly adjusted — aspect ratio, mode, or key settings.
+- **Required** — you must provide this before running — upload a file or type a prompt.
+- **Crucial** — important to check or commonly adjusted — aspect ratio, mode, or key settings.
 
 ## GPU auto-stop
 
@@ -1036,6 +2071,14 @@ Media — the pod watches its own ComfyUI queue. Anything rendering or waiting c
 You can change this. LLM and Media are set independently on your settings page, and either one can be set to never stop automatically.
 
 Running out of balance always stops a GPU, whatever your timeout is set to.
+
+## Logging & data
+
+I run the models on dedicated GPU servers — your requests aren't sent to any third-party AI provider.
+
+Conversations: your chats are saved only if you use the web-UI chat, so you can reopen them. Requests sent through the API (/v1/messages, /v1/chat/completions) are not stored — nothing about their content is written to the database.
+
+Debug logs: for troubleshooting I keep short-lived technical logs on a 3-day rotation (nothing older than 3 days survives). These hold diagnostics — model, timing, token counts, tool names — never conversations. GPU-server logs live on the instance itself and disappear when it goes offline.
 
 ## Partnership Program
 
