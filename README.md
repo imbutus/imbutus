@@ -14,6 +14,8 @@
 
 ## Documentation
 
+**Command pages:** [recon](docs/recon.md) · [attack](docs/attack.md) · [osint](docs/osint.md) · [phish](docs/phish.md) · [lists](docs/lists.md)
+
 On this page
 
 - [Registration & Activation](#registration--activation)
