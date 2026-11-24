@@ -14,7 +14,7 @@
 
 ## Documentation
 
-**Command pages:** [recon](docs/recon.md) · [attack](docs/attack.md) · [osint](docs/osint.md) · [phish](docs/phish.md) · [lists](docs/lists.md)
+**Command pages:** [recon](https://imbutus.com/docs/recon) · [attack](https://imbutus.com/docs/attack) · [osint](https://imbutus.com/docs/osint) · [phish](https://imbutus.com/docs/phish) · [lists](https://imbutus.com/docs/lists)
 
 On this page
 
@@ -40,7 +40,6 @@ On this page
 - [Partnership Program](#partnership-program)
 - [Philosophy](#philosophy)
 - [Verification](#verification)
-- [recon](https://imbutus.com/docs/recon) · [attack](https://imbutus.com/docs/attack) · [osint](https://imbutus.com/docs/osint) · [phish](https://imbutus.com/docs/phish) · [lists](https://imbutus.com/docs/lists) — the command pages
 
 ## Registration & Activation
 
