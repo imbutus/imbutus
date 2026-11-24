@@ -19,11 +19,6 @@
 On this page
 
 - [Registration & Activation](#registration--activation)
-  - [Command pages: recon](docs/recon.md)
-  - [Command pages: attack](docs/attack.md)
-  - [Command pages: osint](docs/osint.md)
-  - [Command pages: phish](docs/phish.md)
-  - [Command pages: lists](docs/lists.md)
 - [LLM](#llm)
   - [Video tutorial](#video-tutorial)
   - [Pricing](#pricing)
@@ -45,6 +40,7 @@ On this page
 - [Partnership Program](#partnership-program)
 - [Philosophy](#philosophy)
 - [Verification](#verification)
+- [recon](docs/recon.md) · [attack](docs/attack.md) · [osint](docs/osint.md) · [phish](docs/phish.md) · [lists](docs/lists.md) — the command pages
 
 ## Registration & Activation
 
