@@ -19,15 +19,24 @@
 On this page
 
 - [Registration & Activation](#registration--activation)
+- [Your own VPS](#your-own-vps)
 - [LLM](#llm)
   - [Video tutorial](#video-tutorial)
   - [Pricing](#pricing)
   - [Models](#models)
   - [Agentic API](#agentic-api)
+  - [Commands](#commands)
+    - [Recon commands](#recon-commands)
+    - [Attack command](#attack-command)
+    - [OSINT commands](#osint-commands)
+    - [Rank](#rank)
   - [Managing workflow runs](#managing-workflow-runs)
   - [Targets behind a sign-in](#targets-behind-a-sign-in)
   - [Tor and .onion targets](#tor-and-onion-targets)
   - [The machine page](#the-machine-page)
+  - [Other features](#other-features)
+    - [Lists](#lists)
+    - [Telegram notifications](#telegram-notifications)
   - [How to use it](#how-to-use-it)
   - [Supported agents](#supported-agents)
 - [Media](#media)
@@ -39,6 +48,7 @@ On this page
 - [Logging & data](#logging--data)
 - [Partnership Program](#partnership-program)
 - [Philosophy](#philosophy)
+- [VIP status](#vip-status)
 - [Verification](#verification)
 
 ## Registration & Activation
@@ -46,6 +56,12 @@ On this page
 After registration, top up your balance to the activation threshold. Once reached, your account activates automatically. The required amount may increase over time — activate early.
 
 Minimum activation balance: $22 (will grow, don't be late)
+
+## Your own VPS
+
+Run the same commands on a server you already rent: connect it in Machines and the full toolchain is installed there — free.
+
+Debian 12/13, Ubuntu 22.04/24.04 or Kali, x86_64, root SSH, 2 GB RAM, 20 GB disk; 15–30 minutes.
 
 ## LLM
 
@@ -158,6 +174,15 @@ Every run also has a page, so you can watch and manage it without a client or th
 - The sign-in panel, when a target needs a session: paste the cookie, or "Sign in through a browser" (see above).
 - Point a saved list at a workflow to scan every target in it.
 
+### Commands
+
+Every command is one message in chat; the model does the rest.
+
+- [Recon](https://imbutus.com/docs/recon) — `recon <target>`: the whole applicable chain for that target.
+- [Attack](https://imbutus.com/docs/attack) — `attack #<handle>` proves one recorded finding; `validate` settles it; `access` uses it.
+- [OSINT](https://imbutus.com/docs/osint) — `osint <subject>` for email, person, company, domain, mentions, phone, username.
+- `rank <domain>` weighs a domain from rank.to + Open PageRank. Every account can use it.
+
 ### How to use it
 
 I personally use Imbutus with PI (pi.dev) — but you can connect any supported client and use it however works best for you.
@@ -167,6 +192,11 @@ The web UI chat works, but it is not the intended primary interface. When a requ
 Dedicated VM — give your machine a name when provisioning (e.g. kalinux01). The AI model knows it by that name and gets direct shell access to run nmap, metasploit, sqlmap and any other tool on it. Just say the name in your prompt — the model connects and operates it. Billed per day — terminate anytime.
 
 ⚠ Billing runs while a session is active. To stop it — use the Stop button on the main page (visible when a model is selected), or tell the model: "stop my session". If no one else is using the GPU at that moment, it will shut down and billing stops immediately.
+
+### Other features
+
+- [Lists](https://imbutus.com/docs/lists) — one ordered, reusable set of items any command can work through: targets to scan, pages to test, hosts to watch. Attach with `--list <id>`.
+- **Telegram notifications** — read the news entry in the app for the current setup.
 
 ### Supported agents
 
@@ -2333,6 +2363,10 @@ Users who signed up with a code before September 24, 2026 keep the original term
 ## Philosophy
 
 This is the project philosophy. First of all, I built these tools for my own casual working, and shared them with everyone. I'll also work on customer demands — if something can be created in theory, then I can implement it. Just ask in the support ticket system. If several users request a single feature or tool, I'll create it. You can think of it as an AI tools boutique run by your friend.
+
+## VIP status
+
+VIP is access to hidden capabilities. Only users who know about them can be interested — if you don't, just ignore it. All documented features work fine for every user, with no restrictions.
 
 ## Verification
 
